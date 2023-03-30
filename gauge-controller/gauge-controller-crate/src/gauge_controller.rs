@@ -761,7 +761,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
                             slope: slope
                                 .checked_mul(
                                     _user_weight
-                                        .checked_div(U256::from(100000))
+                                        .checked_div(U256::from(10000))
                                         .unwrap_or_revert_with(Error::GaugeControllerDivide8),
                                 )
                                 .unwrap_or_revert_with(Error::GaugeControllerMultiply18),
