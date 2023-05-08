@@ -792,7 +792,20 @@ make check-lint
 
 ## Deploying Reward Only Gauge contract manually
 
-If you need to deploy the `Reward Only Gauge` contract manually you need to pass some parameters. Following is the command to deploy the `Reward Only Gauge contract`.
+If you need to deploy the `Reward Only Gauge` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - admin : Admin account hash for curve-dao
+  - lp_token : LP Token contract package hash
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Reward Only Gauge contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -1214,7 +1227,20 @@ Following are the RewardOnlyGauge's entry point methods.
 
 ## Deploying Gauge Controller contract manually
 
-If you need to deploy the `Gauge Controller` contract manually you need to pass some parameters. Following is the command to deploy the `Gauge Controller contract`.
+If you need to deploy the `Gauge Controller` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - token : Erc20 Crv token contract package hash
+  - voting_escrow : Voting escrow deployed contract package hash
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Gauge Controller contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -1658,7 +1684,20 @@ Following are the GaugeController's entry point methods.
 
 ## Deploying Minter contract manually
 
-If you need to deploy the `Minter` contract manually you need to pass some parameters. Following is the command to deploy the `Minter contract`.
+If you need to deploy the `Minter` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - token : Erc20 Crv token contract package hash
+  - controller : Gauge controller deployed contract package hash
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Minter contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -1776,7 +1815,20 @@ Following are the Minter's entry point methods.
 
 ## Deploying Curve Rewards contract manually
 
-If you need to deploy the `Curve Rewards` contract manually you need to pass some parameters. Following is the command to deploy the `Curve Rewards contract`.
+If you need to deploy the `Curve Rewards` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - token : Erc20 token contract package hash
+  - reward : Reward contract deployed contract package hash
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Curve Rewards contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -2094,7 +2146,19 @@ Following are the CurveRewards's entry point methods.
 
 ## Deploying Lp Token Wrapper contract manually
 
-If you need to deploy the `Lp Token Wrapper` contract manually you need to pass some parameters. Following is the command to deploy the `Lp Token Wrapper contract`.
+If you need to deploy the `Lp Token Wrapper` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - uni : ERC20 token contract package hash
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Lp Token Wrapper contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -2172,7 +2236,19 @@ Following are the LpTokenWrapper's entry point methods.
 
 ## Deploying Ownable contract manually
 
-If you need to deploy the `Ownable` contract manually you need to pass some parameters. Following is the command to deploy the `Ownable contract`.
+If you need to deploy the `Ownable` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - uni : ERC20 token contract package hash
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Ownable contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -2236,7 +2312,22 @@ Following are the Ownable's entry point methods.
 
 ## Deploying Liquidity Gauge Wrapper contract manually
 
-If you need to deploy the `Liquidity Gauge Wrapper` contract manually you need to pass some parameters. Following is the command to deploy the `Liquidity Gauge Wrapper contract`.
+If you need to deploy the `Liquidity Gauge Wrapper` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - name : ERC20 token's name to be set
+  - symbol : ERC20 token's symbol to be set
+  - gauge : Gauge controller deployed contract package hash
+  - admin : Admin who can kill the gauge
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Liquidity Gauge Wrapper contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -2603,7 +2694,22 @@ Following are the LiquidityGaugeWrapper's entry point methods.
 
 ## Deploying Liquidity Gauge Reward Wrapper contract manually
 
-If you need to deploy the `Liquidity Gauge Reward Wrapper` contract manually you need to pass some parameters. Following is the command to deploy the `Liquidity Gauge Reward Wrapper contract`.
+If you need to deploy the `Liquidity Gauge Reward Wrapper` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - name : ERC20 token's name to be set
+  - symbol : ERC20 token's symbol to be set
+  - gauge : Gauge controller deployed contract package hash
+  - admin : Admin who can kill the gauge
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Liquidity Gauge Reward Wrapper contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -3028,7 +3134,23 @@ Following are the LiquidityGaugeRewardWrapper's entry point methods.
 
 ## Deploying Liquidity Gauge Reward contract manually
 
-If you need to deploy the `Liquidity Gauge Reward` contract manually you need to pass some parameters. Following is the command to deploy the `Liquidity Gauge Reward contract`.
+If you need to deploy the `Liquidity Gauge Reward` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - lp_addr : Liquidity pool deployed contract package hash
+  - minter : Minter deployed contract package hash
+  - reward_contract : Synthetix reward deployed contract package hash
+  - rewarded_token : Received synthetix token contract package address
+  - admin : Admin who can kill the gauge
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Liquidity Gauge Reward contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -3526,7 +3648,21 @@ Following are the LiquidityGaugeReward's entry point methods.
 
 ## Deploying Liquidity Gauge V3 contract manually
 
-If you need to deploy the `Liquidity Gauge V3` contract manually you need to pass some parameters. Following is the command to deploy the `Liquidity Gauge V3 contract`.
+If you need to deploy the `Liquidity Gauge V3` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - lp_addr : Liquidity pool deployed contract package hash
+  - minter : Minter deployed contract package hash
+  - admin : Admin who can kill the gauge
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Liquidity Gauge V3 contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -4147,7 +4283,20 @@ Following are the LiquidityGaugeV3's entry point methods.
 
 ## Deploying Curve Token V3 contract manually
 
-If you need to deploy the `Curve Token V3` contract manually you need to pass some parameters. Following is the command to deploy the `Curve Token V3 contract`.
+If you need to deploy the `Curve Token V3` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - name : Token name to be setup
+  - symbol : Token Symbol to be setup
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Curve Token V3 contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -4366,7 +4515,20 @@ Following are the CurveTokenV3's entry point methods.
 
 ## Deploying ERC20 CRV contract manually
 
-If you need to deploy the `ERC20 CRV` contract manually you need to pass some parameters. Following is the command to deploy the `ERC20 CRV contract`.
+If you need to deploy the `ERC20 CRV` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - name : Token name to be setup
+  - symbol : Token Symbol to be setup
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `ERC20 CRV contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -4698,7 +4860,22 @@ Following are the ERC20CRV's entry point methods.
 
 ## Deploying ERC20 contract manually
 
-If you need to deploy the `ERC20 contract` manually you need to pass the some parameters. Following is the command to deploy the `ERC20 contract`.
+If you need to deploy the `ERC20 contract` manually you need to pass the following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - name : Token name to be setup
+  - symbol : Token Symbol to be setup
+  - decimals : Decimals unit value for the token
+  - initial_supply : Starting supply for the token
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `ERC20 contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -4923,7 +5100,23 @@ Following are the ERC20's entry point methods.
 
 ## Deploying Fee Distributor contract manually
 
-If you need to deploy the `Fee Distributor` contract manually you need to pass some parameters. Following is the command to deploy the `Fee Distributor contract`.
+If you need to deploy the `Fee Distributor` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - voting_escrow : Voting escrow deployed contract package hash
+  - start_time : Epoch time for fee distribution to start
+  - token : Fee token deployed contract package hash (3CRV)
+  - admin : Admin account hash
+  - emergency_return : Specify address to transfer `_token` balance to if this contract if killed
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Fee Distributor contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -5255,7 +5448,20 @@ Following are the FeeDistributor's entry point methods.
 
 ## Deploying Gauge Proxy contract manually
 
-If you need to deploy the `Gauge Proxy` contract manually you need to pass some parameters. Following is the command to deploy the `Gauge Proxy contract`.
+If you need to deploy the `Gauge Proxy` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - ownership_admin : Address specified for the contract ownership admin
+  - emergency_admin : Address of emergency admin in case of any issue with the ownership admin
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Gauge Proxy contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -5396,7 +5602,18 @@ This method **returns** nothing.
 
 ## Deploying I Reward Distribution Recipient contract manually
 
-If you need to deploy the `I Reward Distribution Recipient` contract manually you need to pass some parameters. Following is the command to deploy the `I Reward Distribution Recipient contract`.
+If you need to deploy the `I Reward Distribution Recipient` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `I Reward Distribution Recipient contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -5472,7 +5689,23 @@ Following are the IRewardDistributionRecipient's entry point methods.
 
 ## Deploying Vesting Escrow contract manually
 
-If you need to deploy the `Vesting Escrow` contract manually you need to pass some parameters. Following is the command to deploy the `Vesting Escrow contract`.
+If you need to deploy the `Vesting Escrow` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - token : Contract package hash of the ERC20 token being distributed
+  - start_time : Timestamp at which the distribution of token starts
+  - end_time : Timestamp until tokens should be vested
+  - can_disable : Option for admin to disable accounts in this deployment
+  - fund_admins : Temporary admin accounts used only for funding
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Vesting Escrow contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -5795,7 +6028,18 @@ Following are the VestingEscrow's entry point methods.
 
 ## Deploying Vesting Escrow Simple contract manually
 
-If you need to deploy the `Vesting Escrow Simple` contract manually you need to pass some parameters. Following is the command to deploy the `Vesting Escrow Simple contract`.
+If you need to deploy the `Vesting Escrow Simple` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Vesting Escrow Simple contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -6061,7 +6305,20 @@ Following are the VestingEscrowSimple's entry point methods.
 
 ## Deploying Vesting Escrow Factory contract manually
 
-If you need to deploy the `Vesting Escrow Factory` contract manually you need to pass some parameters. Following is the command to deploy the `Vesting Escrow Factory contract`.
+If you need to deploy the `Vesting Escrow Factory` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - target : Vesting escrow simple deployed contract package hash
+  - admin : Admin account hash for vesting escrow factory
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Vesting Escrow Factory contract`.
 
 ```bash
 sudo casper-client put-deploy \
@@ -6402,7 +6659,22 @@ Following are the VestingEscrowFactory's entry point methods.
 
 ## Deploying Voting Escrow contract manually
 
-If you need to deploy the `Voting Escrow` contract manually you need to pass some parameters. Following is the command to deploy the `Voting Escrow contract`.
+If you need to deploy the `Voting Escrow` contract manually you need to pass following parameters
+
+- chain-name : Name of casper chain to perform deployment on
+- node-address : Address of chain node to perform transactions
+- secret-key : Path to the account's secret key file (.pem)
+- session-path : Path to Curve-Dao wasm file (.wasm)
+- payment-amount : Gas amount in motes (unit) to perform wasm deployment
+- session-arg : Parameters for the contract initializer
+  - public_key : Deployer account's public key in hex
+  - token : Contract package hash of the ERC20 token being distributed
+  - name : Token name of contract to deploy
+  - symbol : Token symbol of contract to deploy
+  - version : Version handling of the contract
+  - contract_name : Contract name for deployment
+
+Following is the command to deploy the `Voting Escrow contract`.
 
 ```bash
 sudo casper-client put-deploy \
