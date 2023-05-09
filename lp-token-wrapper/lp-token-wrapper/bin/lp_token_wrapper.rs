@@ -43,32 +43,48 @@ fn constructor() {
     let package_hash: ContractPackageHash = runtime::get_named_arg("package_hash");
     LpTokenWrapper::default().constructor(uni, contract_hash, package_hash);
 }
+
+// This function is to return the total token supply
 #[no_mangle]
 fn total_supply() {
     let ret: U256 = LpTokenWrapper::default().total_supply();
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to return the balance of the passed address
+/// # Parameters
+/// * `owner` - Address that holds the account address of the user
 #[no_mangle]
 fn balance_of() {
     let owner: Address = runtime::get_named_arg("owner");
     let ret: U256 = LpTokenWrapper::default().balance_of(owner);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to stake the curve rewards amount
+/// # Parameters
+/// * `amount` - Amount to be staked
 #[no_mangle]
 fn stake() {
     let amount: U256 = runtime::get_named_arg("amount");
     LpTokenWrapper::default().stake(amount);
 }
+
+// This function is to withdraw the curve rewards amount
+/// # Parameters
+/// * `amount` - Amount to be withdrawn
 #[no_mangle]
 fn withdraw() {
     let amount: U256 = runtime::get_named_arg("amount");
     LpTokenWrapper::default().withdraw(amount);
 }
+
 //Variables
 #[no_mangle]
 fn uni() {
     runtime::ret(CLValue::from_t(get_uni()).unwrap_or_revert());
 }
+
 //Entry Points
 fn get_entry_points() -> EntryPoints {
     let mut entry_points = EntryPoints::new();

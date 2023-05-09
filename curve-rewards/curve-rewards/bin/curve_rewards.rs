@@ -50,26 +50,44 @@ fn constructor() {
     let package_hash: ContractPackageHash = runtime::get_named_arg("package_hash");
     CurveRewards::default().constructor(token, reward, contract_hash, package_hash);
 }
+
+// This function is to return the total token supply
 #[no_mangle]
 fn total_supply() {
     runtime::ret(CLValue::from_t(CurveRewards::default().total_supply()).unwrap_or_revert());
 }
+
+// This function is to return the balance of the passed address
+/// # Parameters
+/// * `owner` - Address that holds the account address of the user
 #[no_mangle]
 fn balance_of() {
     let owner: Address = runtime::get_named_arg("owner");
     let ret: U256 = CurveRewards::default().balance_of(owner);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is used for staking the LP tokens according to passed amount
+/// # Parameters
+/// * `amount` - Amount of tokens to be staked
 #[no_mangle]
 fn stake_lp() {
     let amount: U256 = runtime::get_named_arg("amount");
     LPTOKENWRAPPER::stake(&mut CurveRewards::default(), amount);
 }
+
+// This function is used for withdrawing the LP tokens according to passed amount
+/// # Parameters
+/// * `amount` - Amount of tokens to be withdrawn
 #[no_mangle]
 fn withdraw_lp() {
     let amount: U256 = runtime::get_named_arg("amount");
     LPTOKENWRAPPER::withdraw(&mut CurveRewards::default(), amount);
 }
+
+// This function is to set the reward_distribution token address
+/// # Parameters
+/// * `reward_distribution` - reward_distribution deployed contract address for token distribution controlling
 #[no_mangle]
 fn set_reward_distribution() {
     let reward_distribution: Key = runtime::get_named_arg("reward_distribution");
@@ -78,65 +96,103 @@ fn set_reward_distribution() {
         reward_distribution,
     );
 }
+
+// This function is to get the last_time_reward_applicable token address
 #[no_mangle]
 fn last_time_reward_applicable() {
     let ret: U256 = CurveRewards::default().last_time_reward_applicable();
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to get the reward_per_token token address
 #[no_mangle]
 fn reward_per_token() {
     let ret: U256 = CurveRewards::default().reward_per_token();
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to get the calculated earnings of the account passed
+/// # Parameters
+/// * `account` - Address of user to check earnings against of
 #[no_mangle]
 fn earned() {
     let account: Key = runtime::get_named_arg("account");
     let ret: U256 = CurveRewards::default().earned(account);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to stake the curve rewards amount
+/// # Parameters
+/// * `amount` - Amount to be staked
 #[no_mangle]
 fn stake() {
     let amount: U256 = runtime::get_named_arg("amount");
     CURVEREWARDS::stake(&mut CurveRewards::default(), amount);
 }
+
+// This function is to withdraw the curve rewards amount
+/// # Parameters
+/// * `amount` - Amount to be withdrawn
 #[no_mangle]
 fn withdraw() {
     let amount: U256 = runtime::get_named_arg("amount");
     CURVEREWARDS::withdraw(&mut CurveRewards::default(), amount);
 }
+
+// This function is to get the present reward amount for the caller
 #[no_mangle]
 fn get_reward() {
     CurveRewards::default().get_reward();
 }
+
+// This function is to withdraw from the staking and get the present reward for the caller
 #[no_mangle]
 fn exit() {
     CurveRewards::default().exit();
 }
+
+// This function is to update the reward amount
+// can only be called by the only_reward_distribution contract
+/// # Parameters
+/// * `reward` - Amount for the reward notification
 #[no_mangle]
 fn notify_reward_amount() {
     let reward: U256 = runtime::get_named_arg("reward");
     CurveRewards::default().notify_reward_amount(reward);
 }
+
+// This function is to return the owner of the contract
 #[no_mangle]
 fn owner() {
     let ret: Key = OWNABLE::owner(&CurveRewards::default());
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to check if the caller is the owner or not
 #[no_mangle]
 fn is_owner() {
     let ret: bool = OWNABLE::is_owner(&CurveRewards::default());
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// This function is to revoke the ownership from the current owner
+// can be called by the owner only
 #[no_mangle]
 fn renounce_ownership() {
     OWNABLE::renounce_ownership(&mut CurveRewards::default());
 }
+
+// This function is to transfer the ownership from present owner to new one
+/// # Parameters
+/// * `new_owner` - New owner account address to transfer ownership
 #[no_mangle]
 fn transfer_ownership() {
     let new_owner: Key = runtime::get_named_arg("new_owner");
     OWNABLE::transfer_ownership(&mut CurveRewards::default(), new_owner);
 }
-//Variables
+
+// To get variables values //
+
 #[no_mangle]
 fn uni() {
     runtime::ret(CLValue::from_t(get_uni()).unwrap_or_revert());

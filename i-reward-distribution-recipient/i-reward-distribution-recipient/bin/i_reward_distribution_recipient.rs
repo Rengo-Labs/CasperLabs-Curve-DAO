@@ -38,25 +38,39 @@ fn constructor() {
     let package_hash: ContractPackageHash = runtime::get_named_arg("package_hash");
     IRewardDistributionRecipient::default().constructor(contract_hash, package_hash);
 }
+
+// Get the owner address of the contract
 #[no_mangle]
 fn owner() {
     let ret: Key = OWNABLE::owner(&IRewardDistributionRecipient::default());
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// To check if the caller is owner or not
 #[no_mangle]
 fn is_owner() {
     let ret: bool = OWNABLE::is_owner(&IRewardDistributionRecipient::default());
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
+
+// Revoke the admin address by chaning admin to ZERO_ADDRESS
 #[no_mangle]
 fn renounce_ownership() {
     OWNABLE::renounce_ownership(&mut IRewardDistributionRecipient::default());
 }
+
+// Change the ownership to the provided address `new_owner`
+/// # Parameters
+/// * `new_owner` - To be owner address
 #[no_mangle]
 fn transfer_ownership() {
     let new_owner: Key = runtime::get_named_arg("new_owner");
     OWNABLE::transfer_ownership(&mut IRewardDistributionRecipient::default(), new_owner);
 }
+
+// Set the reward_distribution contract package address
+/// # Parameters
+/// * `reward_distribution` - reward_distribution contract package address
 #[no_mangle]
 fn set_reward_distribution() {
     let reward_distribution: Key = runtime::get_named_arg("reward_distribution");
