@@ -301,7 +301,6 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         }
     }
     fn _checkpoint(&mut self, addr: Key) {
-        runtime::print("_checkpoint");
         let token: Key = data::get_crv_token();
         let controller: Key = data::get_controller();
         let mut period: i128 = data::get_period();
@@ -311,11 +310,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         let mut rate: U256 = data::get_inflation_rate();
         let mut new_rate: U256 = rate;
         let prev_future_epoch: U256 = data::get_future_epoch_time();
-        runtime::print("after load");
-        runtime::print(&format!("prev_future_epoch {:?}", prev_future_epoch));
-        runtime::print(&format!("period_time {:?}", period_time));
         if prev_future_epoch >= period_time {
-            runtime::print("future_epoch_time");
             data::set_future_epoch_time(runtime::call_versioned_contract(
                 token.into_hash().unwrap_or_revert().into(),
                 None,
@@ -329,18 +324,13 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 runtime_args! {},
             );
             data::set_inflation_rate(new_rate);
-            runtime::print(&format!("new_rate {:?}", new_rate));
         }
-        runtime::print("after call");
         if data::get_is_killed() {
             rate = 0.into();
         }
         let block_timestamp: u64 = runtime::get_blocktime().into();
         
-        runtime::print(&format!("block_timestamp {:?}", block_timestamp));
-        runtime::print(&format!("period_time {:?}", period_time));
         if U256::from(block_timestamp) > period_time {
-            runtime::print("checkpoint_gauge");
             let working_supply = data::get_working_supply();
             let () = runtime::call_versioned_contract(
                 controller.into_hash().unwrap_or_revert().into(),
@@ -362,13 +352,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 U256::from(block_timestamp),
             );
             
-            runtime::print(&format!("working_supply {:?}", working_supply));
-            runtime::print(&format!("prev_week_time {:?}", prev_week_time));
-            runtime::print(&format!("period_time {:?}", period_time));
-            runtime::print(&format!("week_time {:?}", week_time));
-
             for i in 0..500 {
-                runtime::print(&format!("i {:?}", i));
                 let dt: U256 = week_time
                     .checked_sub(prev_week_time)
                     .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError21);
@@ -381,11 +365,8 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                         "time" => Some(prev_week_time.checked_div(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError22).checked_mul(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError23))
                     },
                 );
-                runtime::print(&format!("working_supply {:?}", working_supply));
                 if working_supply > 0.into() {
-                    runtime::print("working supply");
                     if (prev_future_epoch >= prev_week_time) && (prev_future_epoch < week_time) {
-                        runtime::print("epochs");
                         integrate_inv_supply = integrate_inv_supply
                             .checked_add(
                                 rate.checked_mul(w)
@@ -420,7 +401,6 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                             )
                             .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError33);
                     } else {
-                        runtime::print("epochs else");
                         integrate_inv_supply = integrate_inv_supply
                             .checked_add(
                                 rate.checked_mul(w)
@@ -433,11 +413,8 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                             .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError37);
                     }
                 }
-                
-                runtime::print(&format!("week_time {:?}", week_time));
-                runtime::print(&format!("block_timestamp {:?}", &block_timestamp));
+
                 if week_time == block_timestamp.into() {
-                    runtime::print("break");
                     break;
                 }
                 prev_week_time = week_time;
@@ -449,7 +426,6 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 );
             }
         }
-        runtime::print("loop done");
         period = period
             .checked_add(1.into())
             .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError39);
@@ -489,9 +465,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     }
 
     fn claimable_tokens(&mut self, addr: Key) -> U256 {
-        runtime::print("claimable_tokens");
         self._checkpoint(addr);
-        runtime::print("after_checkpoint");
         data::IntegrateFraction::instance()
             .get(&addr)
             .checked_sub(runtime::call_versioned_contract(
@@ -511,11 +485,9 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     }
 
     fn claimable_reward(&mut self, user: Key, reward_token: Key) -> U256 {
-        runtime::print("claimable_reward");
         let reward_data: RewardDataStruct = self.reward_data(reward_token);
         let mut integral: U256 = reward_data.integral;
         let total_supply = self.total_supply();
-        runtime::print(&format!("total_supply {:?}", total_supply));
         if total_supply != U256::from(0) {
           let block_timestamp: u64 = runtime::get_blocktime().into();
           let last_update: u64 = block_timestamp.min(reward_data.period_finish);
@@ -533,11 +505,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             )
             .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow1)
         }
-        runtime::print(&format!("reward_token {:?}", reward_token));
-        runtime::print(&format!("user {:?}", user));
         let integral_for: U256 = RewardIntegralFor::instance().get(&reward_token, &user);
-        runtime::print(&format!("integral {:?}", integral));
-        runtime::print(&format!("integral_for {:?}", integral_for));
         let new_claimable = self.balance_of(Address::from(user))
           .checked_mul(
             integral
@@ -546,7 +514,6 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
           )
           .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow3)
           / 1000000000;
-        runtime::print(&format!("new_claimable {:?}", new_claimable));
         self.claim_data(user, reward_token).claimable_amount
           .checked_add(new_claimable)
           .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow2)
