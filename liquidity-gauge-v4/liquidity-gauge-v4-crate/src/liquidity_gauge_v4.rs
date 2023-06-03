@@ -35,6 +35,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         data::PeriodTimestamp::init();
         data::WorkingBalances::init();
         data::RewardTokens::init();
+        data::RewardIntegralFor::init();
         ClaimData::init();
         RewardData::init();
         RewardsReceiver::init();
@@ -340,7 +341,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         runtime::print(&format!("period_time {:?}", period_time));
         if U256::from(block_timestamp) > period_time {
             runtime::print("checkpoint_gauge");
-            let mut working_supply = data::get_working_supply();
+            let working_supply = data::get_working_supply();
             let () = runtime::call_versioned_contract(
                 controller.into_hash().unwrap_or_revert().into(),
                 None,
@@ -510,9 +511,11 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     }
 
     fn claimable_reward(&mut self, user: Key, reward_token: Key) -> U256 {
+        runtime::print("claimable_reward");
         let reward_data: RewardDataStruct = self.reward_data(reward_token);
         let mut integral: U256 = reward_data.integral;
         let total_supply = self.total_supply();
+        runtime::print(&format!("total_supply {:?}", total_supply));
         if total_supply != U256::from(0) {
           let block_timestamp: u64 = runtime::get_blocktime().into();
           let last_update: u64 = block_timestamp.min(reward_data.period_finish);
@@ -530,7 +533,11 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             )
             .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow1)
         }
+        runtime::print(&format!("reward_token {:?}", reward_token));
+        runtime::print(&format!("user {:?}", user));
         let integral_for: U256 = RewardIntegralFor::instance().get(&reward_token, &user);
+        runtime::print(&format!("integral {:?}", integral));
+        runtime::print(&format!("integral_for {:?}", integral_for));
         let new_claimable = self.balance_of(Address::from(user))
           .checked_mul(
             integral
@@ -539,7 +546,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
           )
           .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow3)
           / 1000000000;
-
+        runtime::print(&format!("new_claimable {:?}", new_claimable));
         self.claim_data(user, reward_token).claimable_amount
           .checked_add(new_claimable)
           .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow2)
