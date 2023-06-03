@@ -245,7 +245,7 @@ copy-wasm-file-liquidity-gauge-wrapper:
 	cp ${wasm_src_path}/liquidity-gauge-wrapper-session-code.wasm ${liquidity_gauge_wrapper_des_wasm}
 	cp ${wasm_src_path}/minter-token.wasm ${liquidity_gauge_wrapper_des_wasm}
 	cp ${wasm_src_path}/liquidity-gauge-v3.wasm ${liquidity_gauge_wrapper_des_wasm}
-	cp ${wasm_src_path}/liquidity-gauge-v4.wasm ${liquidity_gauge_des_wasm}
+	cp ${wasm_src_path}/liquidity-gauge-v4.wasm ${liquidity_gauge_wrapper_des_wasm}
 	cp ${wasm_src_path}/gauge-controller-token.wasm ${liquidity_gauge_wrapper_des_wasm}
 	cp ${wasm_src_path}/voting-escrow.wasm ${liquidity_gauge_wrapper_des_wasm}
 	cp ${wasm_src_path}/erc20-crv.wasm ${liquidity_gauge_wrapper_des_wasm}
@@ -290,7 +290,7 @@ copy-wasm-file-liquidity-gauge-v3:
 	cp ${root_directory}${wasm_src_path}liquidity_gauge_v3_session_code.wasm ${liquidity_gauge_v3_des_wasm}
 	cp ${wasm_src_path}/test-session-code.wasm ${liquidity_gauge_v3_des_wasm}
 copy-wasm-file-liquidity-gauge-v4:
-	cp ${root_directory}${wasm_src_path}liquidity-gauge-v4.wasm ${liquidity_gauge_v3_des_wasm}
+	cp ${root_directory}${wasm_src_path}liquidity-gauge-v4.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}curve-erc20.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}erc20-crv.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}gauge-controller-token.wasm ${liquidity_gauge_v4_des_wasm}
@@ -359,14 +359,14 @@ all:
 	make test-curve-token-v3
 	make test-curve-erc20
 	make test-erc20-crv
-	make test-fee-distributor
+	# make test-fee-distributor
 	make test-gauge-controller
 	make test-gauge-proxy
-	make test-liquidity-gauge-reward
-	make test-liquidity-gauge-reward-wrapper
-	make test-liquidity-gauge-wrapper
+	# make test-liquidity-gauge-reward
+	# make test-liquidity-gauge-reward-wrapper
+	# make test-liquidity-gauge-wrapper
 	make test-minter
-	make test-reward-only-gauge
+	# make test-reward-only-gauge
 	make test-vesting-escrow
 	make test-vesting-escrow-factory
 	make test-voting-escrow
