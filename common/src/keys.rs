@@ -89,7 +89,7 @@ pub const REWARD_INTEGRAL_DICT: &str = "reward_integral";
 pub const REWARD_INTEGRAL_FOR_DICT: &str = "reward_integral_for";
 pub const CLAIM_DATA_DICT: &str = "claim_data";
 pub const CLAIM_SIG: &str = "claim_sig";
-pub const REWARD_DATA: &str = "reward_data";
+pub const REWARD_DATA_DICT: &str = "reward_data";
 pub const METHOD: &str = "method";
 pub const PARAMS: &str = "params";
 // Vesting Escrow

@@ -1357,6 +1357,28 @@ pub enum Error {
     GaugeProxyIsLocked2 = 11982,
     /// (Gauge Proxy Is Locked)
     GaugeProxyIsLocked3 = 11983,
+
+    //LIQUIDITY GUAGE V3
+    /// (Liquidity Gauge V4 error 1)
+    LiquidityGaugeV4RewardCountExceedsMax = 11984,
+    /// (Liquidity Gauge V4 error 2)
+    LiquidityGaugeV4RewardDataExists1 = 11985,
+    /// (Liquidity Gauge V4 error 3)
+    LiquidityGaugeV4AddRewardAdditionOverFlow = 11986,
+    /// (Liquidity Gauge V4 error 4)
+    LiquidityGaugeV4CurrentDistributorExists1 = 11987,
+    /// (Liquidity Gauge V4 error 5)
+    LiquidityGaugeV4NewDistributorExists1 = 11988,
+    /// (Liquidity Gauge V4 error 6)
+    LiquidityGaugeOnlyAdminOrDistributor = 11989,
+    /// (Liquidity Gauge V4 error 7)
+    LiquidityGaugeOnlyDistributor = 11990,
+    /// (Liquidity Gauge V4 error 8)
+    LiquidityGaugeV4DepositRewardTokensSubtractionOverFlow = 11991,
+    /// (Liquidity Gauge V4 error 9)
+    LiquidityGaugeV4DepositRewardTokensMultiplicationOverFlow = 11992,    
+    /// (Liquidity Gauge V4 error 10)
+    LiquidityGaugeV4DepositRewardTokensAdditionOverFlow = 11993,
 }
 
 impl From<Error> for ApiError {

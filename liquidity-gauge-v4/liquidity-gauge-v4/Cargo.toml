@@ -1,0 +1,23 @@
+[package]
+name = "liquidity-gauge-v4"
+version = "0.2.0"
+authors = ["David Tai <david.tai@rengo.capital>"]
+edition = "2018"
+
+[dependencies]
+casper-contract = "=1.4.4"
+casper-types = "=1.5.0"
+crv20 = "0.1.0"
+curve-casper-erc20 = "0.1.0"
+casperlabs-contract-utils = "0.2.1"
+liquidity-gauge-v3-crate = { path = "../liquidity-gauge-v3-crate" }
+
+[[bin]]
+name = "liquidity-gauge-v3"
+path = "bin/liquidity_gauge_v3.rs"
+bench = false
+doctest = false
+test = false
+
+[features]
+default = ["casper-contract/std", "casper-types/std"]
