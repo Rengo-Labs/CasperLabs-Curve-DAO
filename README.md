@@ -26,6 +26,10 @@ Implementation of following contracts for the CasperLabs platform.
 
 https://docs.google.com/spreadsheets/d/1Rzh1LERQyGiGpHB3djlT1Tk0LNQ18q_eLBWFDPm2bNc/edit#gid=4667616
 
+## Original Documentation From Reference Implementation (Liquidity Gauge V3)
+
+https://curve.readthedocs.io/dao-gauges.html#liquiditygaugev3
+
 ## Table of contents
 
 - [Interacting with the contract](#interacting-with-the-contract)
