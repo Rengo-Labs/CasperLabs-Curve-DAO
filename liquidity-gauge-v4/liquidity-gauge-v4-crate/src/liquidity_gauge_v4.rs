@@ -222,8 +222,8 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 break;
             }
             let token: Key = self.reward_tokens(i.into());
-            let mut reward_data: RewardDataStruct = self.reward_data(token);
 
+            let mut reward_data: RewardDataStruct = self.reward_data(token);
             let mut integral: U256 = reward_data.integral;
 
             let block_timestamp: u64 = runtime::get_blocktime().into();
@@ -244,7 +244,9 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                     / _total_supply
                   )
                   .unwrap_or_revert_with(Error::LiquidityGaugeV4CheckpointRewardsAdditionOverFlow);
+                reward_data.integral = integral;
               }
+              RewardData::instance().set(&token, reward_data);
             }
 
             if _user != zero_address() {
