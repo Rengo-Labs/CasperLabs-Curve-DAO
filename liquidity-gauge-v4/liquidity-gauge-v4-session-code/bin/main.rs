@@ -32,7 +32,7 @@ pub extern "C" fn call() {
     let package_hash: Key = runtime::get_named_arg("package_hash");
 
     match entrypoint.as_str() {
-        // Liquidity gauge v3
+        // Liquidity gauge v4
         TRANSFER => {
             let recipient: Key = runtime::get_named_arg("recipient");
             let amount: U256 = runtime::get_named_arg("amount");

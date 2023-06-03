@@ -1378,7 +1378,17 @@ pub enum Error {
     /// (Liquidity Gauge V4 error 9)
     LiquidityGaugeV4DepositRewardTokensMultiplicationOverFlow = 11992,    
     /// (Liquidity Gauge V4 error 10)
-    LiquidityGaugeV4DepositRewardTokensAdditionOverFlow = 11993,
+    LiquidityGaugeV4DepositRewardTokensAdditionOverFlow1 = 11993,
+    /// (Liquidity Gauge V4 error 11)
+    LiquidityGaugeV4DepositCheckpointRewardsSubtractionOverFlow = 11994,
+    /// (Liquidity Gauge V4 error 12)
+    LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow1 = 11995,
+    /// (Liquidity Gauge V4 error 13)
+    LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow2 = 11996,
+    /// (Liquidity Gauge V4 error 14)
+    LiquidityGaugeV4DepositCheckpointRewardsAdditionOverFlow = 11997,
+    /// (Liquidity Gauge V4 error 15)
+    LiquidityGaugeV4DepositRewardTokensAdditionOverFlow2 = 11998,
 }
 
 impl From<Error> for ApiError {

@@ -1,5 +1,5 @@
 use crate::data::{
-    self, get_lp_token, get_package_hash, ClaimData, ClaimDataStruct, PeriodTimestamp, RewardData,
+    self, get_lp_token, get_package_hash, ClaimData, ClaimDataStruct, PeriodTimestamp, RewardData, RewardDataStruct,
     RewardIntegral, RewardIntegralFor, RewardTokens, RewardsReceiver, CLAIM_FREQUENCY, MAX_REWARDS,
 };
 use crate::{alloc::string::ToString, event::*};
@@ -108,7 +108,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     fn lp_token(&mut self) -> Key {
         data::get_lp_token()
     }
-    fn reward_count(&mut self) -> Key {
+    fn reward_count(&mut self) -> U256 {
         data::get_reward_count()
     }
     fn admin(&mut self) -> Key {
@@ -128,7 +128,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         ClaimData::instance().get(&user, &claiming_address)
     }
 
-    //function implementaion of liquidity gauge v3
+    //function implementaion of liquidity gauge v4
 
     fn integrate_checkpoint(&self) -> U256 {
         PeriodTimestamp::instance().get(&U256::from(data::get_period()))
@@ -203,109 +203,55 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         _claim: bool,
         _receiver: Key,
     ) {
-        let mut reward_tokens: Vec<Key> = Vec::new();
-        let mut reward_integrals: Vec<U256> = Vec::new();
-        for i in 0..(MAX_REWARDS.as_usize()) {
-            let token: Key = self.reward_tokens(i.into());
-            if token == zero_address() {
-                break;
-            }
-            reward_tokens.push(token);
-            reward_integrals.push(self.reward_integral(token));
-        }
-        let mut reward_data: RewardData = self.reward_data();
-        if _total_supply != 0.into()
-            && reward_data.address != zero_address()
-            && reward_data.time_stamp != 0.into()
-            && U256::from(u64::from(runtime::get_blocktime()))
-                > (reward_data.time_stamp + U256::from(CLAIM_FREQUENCY.as_u128()))
-        {
-            let mut reward_balances: Vec<U256> = Vec::new();
-            for i in 0..(MAX_REWARDS.as_usize()) {
-                let token: Key = self.reward_tokens(i.into());
-                if token == zero_address() {
-                    break;
-                }
-                reward_balances.push(runtime::call_versioned_contract(
-                    token.into_hash().unwrap_or_revert().into(),
-                    None,
-                    "balance_of",
-                    runtime_args! {
-                        "owner" => Key::from(data::get_package_hash())
-                    },
-                ));
-            }
-            let reward_contract = reward_data.address;
-            let reward_contract_hash_add_array = match reward_contract {
-                Key::Hash(package) => package,
-                _ => runtime::revert(ApiError::UnexpectedKeyVariant),
-            };
-            let reward_contract_package_hash =
-                ContractPackageHash::new(reward_contract_hash_add_array);
-            let () = runtime::call_versioned_contract(
-                reward_contract_package_hash,
-                None,
-                "claim_sig",
-                runtime_args! {},
-            );
-            reward_data.address = reward_contract;
-            reward_data.time_stamp = U256::from(u64::from(runtime::get_blocktime()));
-
-            for i in 0..(MAX_REWARDS.as_usize()) {
-                let token: Key = self.reward_tokens(i.into());
-                if token == zero_address() {
-                    break;
-                }
-
-                let token_balance: U256 = runtime::call_versioned_contract(
-                    token.into_hash().unwrap_or_revert().into(),
-                    None,
-                    "balance_of",
-                    runtime_args! {
-                        "owner" => Key::from(get_package_hash())
-                    },
-                );
-
-                let d_i: U256 = U256::from(1000000000)
-                    .checked_mul(
-                        token_balance
-                            .checked_sub(reward_balances[i])
-                            .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError12),
-                    )
-                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError13)
-                    .checked_div(_total_supply)
-                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError14);
-                if d_i > 0.into() {
-                    reward_integrals[i] = reward_integrals[i]
-                        .checked_add(d_i)
-                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError15);
-                    data::RewardIntegral::instance().set(&token, reward_integrals[i]);
-                }
-            }
-        }
+        let mut user_balance:U256 = U256::from(0);
+        let mut receiver = _receiver;
 
         if _user != zero_address() {
-            let mut receiver: Key = _receiver;
+            user_balance = self.balance_of(Address::from(_user));
             if _claim && receiver == zero_address() {
+                // if receiver is not explicitly declared, check if a default receiver is set
                 receiver = RewardsReceiver::instance().get(&_user);
                 if receiver == zero_address() {
+                    //# if receiver is not explicitly declared, check if a default receiver is set
                     receiver = _user;
                 }
             }
-            
-            let user_balance: U256 = self.balance_of(Address::from(_user));
-            for (i, item) in reward_integrals
-                .iter()
-                .enumerate()
-                .take(MAX_REWARDS.as_usize())
-            {
-                let token: Key = self.reward_tokens(i.into());
-                if token == zero_address() {
-                    break;
-                }
-                let integral = *item;
+        }
+
+        let reward_count = self.reward_count();
+        for i in 0..(MAX_REWARDS.as_usize()) {
+            if U256::from(i) == reward_count {
+                break;
+            }
+            let token: Key = self.reward_tokens(i.into());
+            let mut reward_data: RewardDataStruct = self.reward_data(token);
+
+            let mut integral: U256 = reward_data.integral;
+
+            let block_timestamp: u64 = runtime::get_blocktime().into();
+            let last_update: u64 = block_timestamp.min(reward_data.period_finish);
+            let duration: u64 = last_update
+                .checked_sub(reward_data.last_update)
+                .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsSubtractionOverFlow);
+            if duration != 0 {
+              reward_data.last_update = last_update;
+              if _total_supply != U256::from(0) {
+                integral = integral
+                  .checked_add(
+                    U256::from(duration)
+                      .checked_mul(reward_data.rate)
+                      .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow1)
+                      .checked_mul(U256::from(1000000000))
+                      .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow2)
+                    / _total_supply
+                  )
+                  .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsAdditionOverFlow);
+              }
+            }
+
+            if _user != zero_address() {
                 let integral_for = RewardIntegralFor::instance().get(&token, &_user);
-                let mut new_claimable: U256 = 0.into();
+                let mut new_claimable: U256 = U256::from(0);
                 if integral_for < integral {
                     RewardIntegralFor::instance().set(&token, &_user, integral);
                     new_claimable = user_balance
@@ -323,7 +269,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                     .claimable_amount
                     .checked_add(new_claimable)
                     .unwrap_or_revert_with(Error::LiquidityGaugeUnderFlow6);
-                if total_claimable > 0.into() {
+                if total_claimable > U256::from(0) {
                     let total_claimed = claim_data.claimed_amount;
                     if _claim {
                         let token_hash_add_array = match token {
@@ -343,7 +289,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                             .checked_add(total_claimable)
                             .unwrap_or_revert_with(Error::LiquidityGaugeOverFlow3);
                         ClaimData::instance().set(&_user, &token, claim_data);
-                    } else if new_claimable > 0.into() {
+                    } else if new_claimable > U256::from(0) {
                         claim_data.claimed_amount = total_claimed;
                         claim_data.claimable_amount = total_claimable;
                         ClaimData::instance().set(&_user, &token, claim_data);
@@ -532,19 +478,6 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError44)
     }
 
-    fn reward_contract(&mut self) -> Key {
-        let address = self.reward_data().address;
-        if address == zero_address() {
-            zero_address()
-        } else {
-            address
-        }
-    }
-
-    fn last_claim(&mut self) -> U256 {
-        self.reward_data().time_stamp
-    }
-
     fn claimed_reward(&mut self, addr: Key, token: Key) -> U256 {
         self.claim_data(addr, token).claimed_amount
     }
@@ -552,23 +485,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     fn claimable_reward(&mut self, addr: Key, token: Key) -> U256 {
         self.claim_data(addr, token).claimable_amount
     }
-/*
-    fn claimable_reward_write(&mut self, addr: Key, token: Key) -> U256 {
-        let lock = data::get_lock();
-        if lock {
-            // Locked
-            runtime::revert(Error::LiquidityGaugeLocked1);
-        }
-        data::set_lock(true);
-        let reward_token = self.reward_tokens(0.into());
-        if reward_token != zero_address() {
-            let total_supply = self.total_supply();
-            self._checkpoint_rewards(addr, total_supply, false, zero_address());
-        }
-        data::set_lock(false);
-        self.claim_data(addr, token).claimable_amount
-    }
-*/
+
     fn set_rewards_receiver(&mut self, receiver: Key) {
         RewardsReceiver::instance().set(&self.get_caller(), receiver)
     }
@@ -858,27 +775,27 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         if self.get_caller() != self.admin() {
             runtime::revert(Error::LiquidityGaugeOnlyAdmin2);
         }
-        let reward_count = self.reward_count()
+        let reward_count = self.reward_count();
         if reward_count >= MAX_REWARDS {
             runtime::revert(Error::LiquidityGaugeV4RewardCountExceedsMax);
         }
-        let reward_data: RewardDataStruct = self::reward_data(&_reward_token);
+        let mut reward_data: RewardDataStruct = self.reward_data(_reward_token);
         if reward_data.distributor == zero_address() {
             runtime::revert(Error::LiquidityGaugeV4RewardDataExists1);
         }
         reward_data.distributor = distributor;
-        RewardData::instance().set(_reward_token, &reward_data);
+        RewardData::instance().set(&_reward_token, reward_data);
 
-        RewardTokens::instance().set(&reward_count.into(), reward_token);
+        RewardTokens::instance().set(&reward_count.into(), _reward_token);
         let new_reward_count = reward_count
-            .checked_add(1.into())
-            .unwrap_or_revert_with(Error::LiquidityGaugeV4AddRewardAdditionOverFlow)
+            .checked_add(U256::from(1))
+            .unwrap_or_revert_with(Error::LiquidityGaugeV4AddRewardAdditionOverFlow);
         data::set_reward_count(new_reward_count.into())
     }
 
     fn set_reward_distributor(&mut self, _reward_token: Key, distributor: Key) {
-        let reward_data: RewardDataStruct = self::reward_data(_reward_token);
-        let current_distributor: RewardDataStruct = reward_data.distributor()
+        let mut reward_data: RewardDataStruct = self.reward_data(_reward_token);
+        let current_distributor: Key = reward_data.distributor;
         if self.get_caller() != self.admin() || self.get_caller() == current_distributor {
           runtime::revert(Error::LiquidityGaugeOnlyAdminOrDistributor);
         }
@@ -890,11 +807,11 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         }
 
         if reward_data.distributor != zero_address() {
-            runtime::revert(Error::LiquidityGaugeV4RewardDataExists);
+            runtime::revert(Error::LiquidityGaugeV4RewardDataExists1);
         }
 
         reward_data.distributor = distributor;
-        RewardData::instance().set(_reward_token, &reward_data);
+        RewardData::instance().set(&_reward_token, reward_data);
     }
 
     fn deposit_reward_token(&mut self, _reward_token: Key, amount: U256) {
@@ -904,8 +821,8 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         }
         data::set_lock(true);
 
-        let reward_data: RewardDataStruct = self::reward_data(_reward_token);
-        let current_distributor: RewardDataStruct = reward_data.distributor()
+        let mut reward_data: RewardDataStruct = self.reward_data(_reward_token);
+        let current_distributor: Key = reward_data.distributor;
         if self.get_caller() == current_distributor {
           runtime::revert(Error::LiquidityGaugeOnlyDistributor);
         }
@@ -915,10 +832,14 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
           self.total_supply(),
           false,
           zero_address(),
-        )
-
+        );
+        let token_hash = match _reward_token {
+          Key::Hash(package) => package,
+          _ => runtime::revert(ApiError::UnexpectedContractRefVariant),
+        };
+        let token_package_hash = ContractPackageHash::new(token_hash);
         let _ret: () = runtime::call_versioned_contract(
-          _reward_token,
+          token_package_hash,
           None,
           "transfer_from",
           runtime_args! {
@@ -928,25 +849,29 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
           },
         );
 
-        let period_finish: u64 = reward_data.period_finish
+        let period_finish: u64 = reward_data.period_finish;
         let block_timestamp: u64 = runtime::get_blocktime().into();
-        if (block_timestamp >= period_finish) {
-          reward_data.rate = amount / WEEK;
+        if block_timestamp >= period_finish {
+          reward_data.rate = amount / data::WEEK;
         } else {
           let remaining: u64 = period_finish
             .checked_sub(block_timestamp)
             .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensSubtractionOverFlow);
-          let leftover: U256 = U256::from(remaining.into())
+          let leftover: U256 = U256::from(remaining)
             .checked_mul(reward_data.rate)
             .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensMultiplicationOverFlow);
+          reward_data.rate = amount
+            .checked_add(leftover)
+            .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensAdditionOverFlow1) 
+            / data::WEEK
         }
 
         reward_data.last_update = block_timestamp;
-        reward_data.period_finish = block.timestamp
-          .checked_add(WEEK)
-          .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensAdditionOverFlow);
+        reward_data.period_finish = block_timestamp
+          .checked_add(data::WEEK.as_u64())
+          .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensAdditionOverFlow2);
 
-        RewardData::instance().set(_reward_token, &reward_data);        
+        RewardData::instance().set(&_reward_token, reward_data);
         data::set_lock(false);
     }
 

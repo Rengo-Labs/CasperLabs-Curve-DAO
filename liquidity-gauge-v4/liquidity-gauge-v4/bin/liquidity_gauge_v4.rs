@@ -20,7 +20,7 @@ use casper_types::{
 };
 use casperlabs_contract_utils::{ContractContext, OnChainContractStorage};
 use crv20::{self, Address, CURVEERC20};
-use liquidity_gauge_v3_crate::{self, data, utils::*, LIQUIDITYTGAUGEV4};
+use liquidity_gauge_v4_crate::{self, data, utils::*, LIQUIDITYTGAUGEV4};
 #[derive(Default)]
 struct LiquidityGaugeV4(OnChainContractStorage);
 
@@ -273,7 +273,7 @@ fn set_reward_distributor() {
 #[no_mangle]
 fn deposit_reward_token() {
     let reward_token: Key = runtime::get_named_arg("reward_token");
-    let amount: Key = runtime::get_named_arg("amount");
+    let amount: U256 = runtime::get_named_arg("amount");
     LiquidityGaugeV4::default().deposit_reward_token(reward_token, amount);
 }
 

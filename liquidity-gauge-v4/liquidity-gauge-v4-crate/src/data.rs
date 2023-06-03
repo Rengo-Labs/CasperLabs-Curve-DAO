@@ -374,7 +374,7 @@ pub fn set_myvec(myvec: Vec<Key>) {
 
 #[derive(Clone, Copy, CLTyped, ToBytes, FromBytes)]
 pub struct RewardDataStruct {
-    pub token: Key,
+    // pub token: Key,
     pub distributor: Key,
     pub period_finish: u64,
     pub rate: U256,
@@ -423,20 +423,7 @@ impl RewardData {
                     ))
                     .as_str(),
                 )
-                .unwrap_or_default(),
-
-          period_finish: self
-              .dict
-                .get(
-                    hash(format!(
-                        "{}{}{}",
-                        REWARD_DATA_DICT,
-                        "_period_finish_",
-                        reward_token_address.to_formatted_string(),
-                    ))
-                    .as_str(),
-                )
-                .unwrap_or_default(),
+                .unwrap_or_else(zero_address),
 
           period_finish: self
               .dict
@@ -590,7 +577,7 @@ pub fn set_reward_count(reward_count: U256) {
 }
 
 pub fn get_reward_count() -> U256 {
-    get_key(REWARD_COUNT).unwrap_or_else()
+    get_key(REWARD_COUNT).unwrap_or_default()
 }
 
 pub fn set_controller(controller: Key) {
