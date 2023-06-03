@@ -2,7 +2,6 @@
 #![no_std]
 extern crate alloc;
 
-use crate::vec::Vec;
 use alloc::{
     boxed::Box,
     collections::BTreeSet,
@@ -109,17 +108,17 @@ fn claimed_reward() {
 /// @dev This call does not consider pending claimable amount in `reward_contract`.
 ///      Off-chain callers should instead use `claimable_rewards_write` as a
 ///      view method.
-/// @param _addr Account to get reward amount for
+/// @param _user Account to get reward amount for
 /// @param _token Token to get reward amount for
 /// @return uint256 Claimable reward token amount
 /// """
 
 #[no_mangle]
 fn claimable_reward() {
-    let addr: Key = runtime::get_named_arg("addr");
-    let token: Key = runtime::get_named_arg("token");
+    let user: Key = runtime::get_named_arg("user");
+    let reward_token: Key = runtime::get_named_arg("reward_token");
 
-    let ret: U256 = LiquidityGaugeV4::default().claimable_reward(addr, token);
+    let ret: U256 = LiquidityGaugeV4::default().claimable_reward(user, reward_token);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 /// """
@@ -510,8 +509,8 @@ fn get_entry_points() -> EntryPoints {
     entry_points.add_entry_point(EntryPoint::new(
         "claimable_reward",
         vec![
-            Parameter::new("addr", Key::cl_type()),
-            Parameter::new("token", Key::cl_type()),
+            Parameter::new("user", Key::cl_type()),
+            Parameter::new("reward_token", Key::cl_type()),
         ],
         U256::cl_type(),
         EntryPointAccess::Public,

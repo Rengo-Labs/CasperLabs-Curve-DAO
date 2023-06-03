@@ -1380,15 +1380,29 @@ pub enum Error {
     /// (Liquidity Gauge V4 error 10)
     LiquidityGaugeV4DepositRewardTokensAdditionOverFlow1 = 11993,
     /// (Liquidity Gauge V4 error 11)
-    LiquidityGaugeV4DepositCheckpointRewardsSubtractionOverFlow = 11994,
+    LiquidityGaugeV4CheckpointRewardsSubtractionOverFlow = 11994,
     /// (Liquidity Gauge V4 error 12)
-    LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow1 = 11995,
+    LiquidityGaugeV4CheckpointRewardsMultiplicationOverFlow1 = 11995,
     /// (Liquidity Gauge V4 error 13)
-    LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow2 = 11996,
+    LiquidityGaugeV4CheckpointRewardsMultiplicationOverFlow2 = 11996,
     /// (Liquidity Gauge V4 error 14)
-    LiquidityGaugeV4DepositCheckpointRewardsAdditionOverFlow = 11997,
+    LiquidityGaugeV4CheckpointRewardsAdditionOverFlow = 11997,
     /// (Liquidity Gauge V4 error 15)
     LiquidityGaugeV4DepositRewardTokensAdditionOverFlow2 = 11998,
+    /// (Liquidity Gauge V4 error 16)
+    LiquidityGaugeV4ClaimableRewardSubtractionOverFlow1 = 11999,
+    /// (Liquidity Gauge V4 error 17)
+    LiquidityGaugeV4ClaimableRewardAdditionOverFlow1 = 11200,
+    /// (Liquidity Gauge V4 error 18)
+    LiquidityGaugeV4ClaimableRewardAdditionOverFlow2 = 12001,
+    /// (Liquidity Gauge V4 error 19)
+    LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow1 = 12002,
+    /// (Liquidity Gauge V4 error 20)
+    LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow2 = 12003,
+    /// (Liquidity Gauge V4 error 21)
+    LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow3 = 12004,
+    /// (Liquidity Gauge V4 error 22)
+    LiquidityGaugeV4ClaimableRewardSubtractionOverFlow2 = 12005,
 }
 
 impl From<Error> for ApiError {

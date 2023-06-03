@@ -1,15 +1,13 @@
 use crate::data::{
-    self, get_lp_token, get_package_hash, ClaimData, ClaimDataStruct, PeriodTimestamp, RewardData, RewardDataStruct,
-    RewardIntegral, RewardIntegralFor, RewardTokens, RewardsReceiver, CLAIM_FREQUENCY, MAX_REWARDS,
+    self, get_package_hash, ClaimData, ClaimDataStruct, PeriodTimestamp, RewardData, RewardDataStruct,
+    RewardIntegral, RewardIntegralFor, RewardTokens, RewardsReceiver, MAX_REWARDS,
 };
 use crate::{alloc::string::ToString, event::*};
-use alloc::vec::Vec;
 use alloc::{collections::BTreeMap, string::String};
 use casper_contract::{
     contract_api::{runtime, storage},
     unwrap_or_revert::UnwrapOrRevert,
 };
-use casper_types::bytesrepr::Bytes;
 use casper_types::{
     runtime_args, ApiError, ContractHash, ContractPackageHash, Key, RuntimeArgs, U256,
 };
@@ -232,7 +230,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             let last_update: u64 = block_timestamp.min(reward_data.period_finish);
             let duration: u64 = last_update
                 .checked_sub(reward_data.last_update)
-                .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsSubtractionOverFlow);
+                .unwrap_or_revert_with(Error::LiquidityGaugeV4CheckpointRewardsSubtractionOverFlow);
             if duration != 0 {
               reward_data.last_update = last_update;
               if _total_supply != U256::from(0) {
@@ -240,12 +238,12 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                   .checked_add(
                     U256::from(duration)
                       .checked_mul(reward_data.rate)
-                      .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow1)
+                      .unwrap_or_revert_with(Error::LiquidityGaugeV4CheckpointRewardsMultiplicationOverFlow1)
                       .checked_mul(U256::from(1000000000))
-                      .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsMultiplicationOverFlow2)
+                      .unwrap_or_revert_with(Error::LiquidityGaugeV4CheckpointRewardsMultiplicationOverFlow2)
                     / _total_supply
                   )
-                  .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositCheckpointRewardsAdditionOverFlow);
+                  .unwrap_or_revert_with(Error::LiquidityGaugeV4CheckpointRewardsAdditionOverFlow);
               }
             }
 
@@ -482,8 +480,40 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         self.claim_data(addr, token).claimed_amount
     }
 
-    fn claimable_reward(&mut self, addr: Key, token: Key) -> U256 {
-        self.claim_data(addr, token).claimable_amount
+    fn claimable_reward(&mut self, user: Key, reward_token: Key) -> U256 {
+        let reward_data: RewardDataStruct = self.reward_data(reward_token);
+        let mut integral: U256 = reward_data.integral;
+        let total_supply = self.total_supply();
+        if total_supply != U256::from(0) {
+          let block_timestamp: u64 = runtime::get_blocktime().into();
+          let last_update: u64 = block_timestamp.min(reward_data.period_finish);
+          let duration : u64 = last_update
+            .checked_sub(reward_data.last_update)
+            .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardSubtractionOverFlow1);
+          integral = integral
+            .checked_add(
+              duration
+                .checked_mul(reward_data.last_update)
+                .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow1)
+                .checked_mul(1000000000)
+                .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow2)
+                .into()
+            )
+            .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow1)
+        }
+        let integral_for: U256 = RewardIntegralFor::instance().get(&reward_token, &user);
+        let new_claimable = self.balance_of(Address::from(user))
+          .checked_mul(
+            integral
+              .checked_sub(integral_for)
+              .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardSubtractionOverFlow2)
+          )
+          .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow3)
+          / 1000000000;
+
+        self.claim_data(user, reward_token).claimable_amount
+          .checked_add(new_claimable)
+          .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow2)
     }
 
     fn set_rewards_receiver(&mut self, receiver: Key) {

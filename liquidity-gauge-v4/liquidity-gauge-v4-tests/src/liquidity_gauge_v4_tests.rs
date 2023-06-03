@@ -208,7 +208,7 @@ mod t1 {
 }
 mod t2 {
 
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_increase_allowance() {
         let (env, owner, contract, time_now) = deploy();
@@ -273,7 +273,7 @@ mod t2 {
 }
 mod t3 {
 
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_integrate_checkpoint() {
         let (env, owner, contract, time_now) = deploy();
@@ -361,7 +361,7 @@ mod t3 {
 }
 mod t6 {
 
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_deposit() {
         let (_, owner, contract, time_now) = deploy();
@@ -371,7 +371,7 @@ mod t6 {
     }
 }
 mod t7 {
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_withdraw() {
         let (_, owner, contract, time_now) = deploy();
@@ -382,7 +382,7 @@ mod t7 {
     }
 }
 mod t8 {
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_transfer() {
         let (env, owner, contract, time_now) = deploy();
@@ -395,7 +395,7 @@ mod t8 {
     }
 }
 mod t9 {
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_transfer_from() {
         let (env, owner, contract, time_now) = deploy();
@@ -415,7 +415,7 @@ mod t9 {
     }
 }
 mod t10 {
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_claimable_tokens() {
         let (env, owner, contract, time_now) = deploy();
@@ -439,7 +439,7 @@ mod t10 {
 }
 mod t4 {
 
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_claimable_reward_write() {
         let (env, owner, contract, time_now) = deploy();
@@ -474,7 +474,7 @@ mod t4 {
             TEST_SESSION_CODE_NAME,
             owner,
             runtime_args! {
-                "entrypoint" => String::from(CLAIMABLE_V4_REWARD),
+                "entrypoint" => String::from(CLAIMABLE_V3_REWARD),
                 "package_hash" => Key::Hash(contract.package_hash()),
                 "addr"=>Key::from(addr),
                 "token"=>Key::from(token)
@@ -486,7 +486,7 @@ mod t4 {
     }
 }
 mod t11 {
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_user_checkpoint() {
         let (env, owner, contract, time_now) = deploy();
@@ -509,7 +509,7 @@ mod t11 {
 }
 mod t5 {
 
-    use crate::liquidity_gauge_V4_tests::*;
+    use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_set_rewards_receiver() {
         let (env, owner, contract, time_now) = deploy();

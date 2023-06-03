@@ -296,7 +296,7 @@ copy-wasm-file-liquidity-gauge-v4:
 	cp ${root_directory}${wasm_src_path}gauge-controller-token.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}minter-token.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}voting-escrow.wasm ${liquidity_gauge_v4_des_wasm}
-	cp ${root_directory}${wasm_src_path}liquidity_gauge_v4_session_code.wasm ${liquidity_gauge_v3_des_wasm}
+	cp ${root_directory}${wasm_src_path}liquidity_gauge_v3_session_code.wasm ${liquidity_gauge_v3_des_wasm}
 	cp ${wasm_src_path}/test-session-code.wasm ${liquidity_gauge_v4_des_wasm}
 copy-wasm-file-ownable:
 	cp ${wasm_src_path}/ownable.wasm ${ownable_des_wasm}
