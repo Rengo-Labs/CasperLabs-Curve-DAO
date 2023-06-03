@@ -162,9 +162,8 @@ test-only-liquidity-gauge-v3:
 	cargo test -p liquidity-gauge-v3-tests t10 -- --test-threads=1
 	cargo test -p liquidity-gauge-v3-tests t11 -- --test-threads=1
 	cargo test -p liquidity-gauge-v3-tests t12 -- --test-threads=1
-	# Intense memory test cases below (Require 32gb + RAM)
-	# cargo test -p liquidity-gauge-v3-tests t8
-	# cargo test -p liquidity-gauge-v3-tests t9
+	cargo test -p liquidity-gauge-v3-tests t8
+	cargo test -p liquidity-gauge-v3-tests t9
 test-only-liquidity-gauge-v4:
 	cargo test -p liquidity-gauge-v4-tests t1 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t2 -- --test-threads=1
@@ -176,9 +175,9 @@ test-only-liquidity-gauge-v4:
 	cargo test -p liquidity-gauge-v4-tests t10 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t11 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t12 -- --test-threads=1
-	# Intense memory test cases below (Require 32gb + RAM)
-	# cargo test -p liquidity-gauge-v4-tests t8
-	# cargo test -p liquidity-gauge-v4-tests t9
+	cargo test -p liquidity-gauge-v4-tests t8
+	cargo test -p liquidity-gauge-v4-tests t9
+
 test-only-i-reward-distribution-recipient:
 	cargo test -p i-reward-distribution-recipient-tests
 test-only-ownable:
