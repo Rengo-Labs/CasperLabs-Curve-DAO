@@ -494,12 +494,12 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardSubtractionOverFlow1);
           integral = integral
             .checked_add(
-              duration
-                .checked_mul(reward_data.last_update)
+              U256::from(duration)
+                .checked_mul(reward_data.rate)
                 .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow1)
-                .checked_mul(1000000000)
+                .checked_mul(U256::from(1000000000))
                 .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow2)
-                .into()
+                / total_supply
             )
             .unwrap_or_revert_with(Error::LiquidityGaugeV4ClaimableRewardAdditionOverFlow1)
         }
@@ -635,6 +635,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             self.set_balance(Address::from(_addr), new_balance);
             self.set_total_supply(total_supply);
             self._update_liquidity_limit(_addr, new_balance, total_supply);
+
             let lp_token = self.lp_token();
             let token_hash_add_array = match lp_token {
                 Key::Hash(package) => package,
@@ -812,7 +813,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             runtime::revert(Error::LiquidityGaugeV4RewardCountExceedsMax);
         }
         let mut reward_data: RewardDataStruct = self.reward_data(_reward_token);
-        if reward_data.distributor == zero_address() {
+        if reward_data.distributor != zero_address() {
             runtime::revert(Error::LiquidityGaugeV4RewardDataExists1);
         }
         reward_data.distributor = distributor;
@@ -828,7 +829,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     fn set_reward_distributor(&mut self, _reward_token: Key, distributor: Key) {
         let mut reward_data: RewardDataStruct = self.reward_data(_reward_token);
         let current_distributor: Key = reward_data.distributor;
-        if self.get_caller() != self.admin() || self.get_caller() == current_distributor {
+        if self.get_caller() != self.admin() && self.get_caller() != current_distributor {
           runtime::revert(Error::LiquidityGaugeOnlyAdminOrDistributor);
         }
         if current_distributor == zero_address() {
@@ -855,7 +856,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
 
         let mut reward_data: RewardDataStruct = self.reward_data(_reward_token);
         let current_distributor: Key = reward_data.distributor;
-        if self.get_caller() == current_distributor {
+        if self.get_caller() != current_distributor {
           runtime::revert(Error::LiquidityGaugeOnlyDistributor);
         }
 
