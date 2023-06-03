@@ -75,7 +75,7 @@ build-contract-liquidity-gauge-v3:
 	cargo build --release -p test-session-code -p liquidity-gauge-v3-session-code -p liquidity-gauge-v3 -p curve-erc20 -p minter -p voting-escrow -p gauge-controller -p erc20-crv  --target wasm32-unknown-unknown
 	wasm-strip target/wasm32-unknown-unknown/release/liquidity-gauge-v3.wasm 2>/dev/null | true
 build-contract-liquidity-gauge-v4:
-	cargo build --release -p test-session-code -p liquidity-gauge-v3-session-code -p liquidity-gauge-v4 -p curve-erc20 -p minter -p voting-escrow -p gauge-controller -p erc20-crv  --target wasm32-unknown-unknown
+	cargo build --release -p test-session-code -p liquidity-gauge-v4-session-code -p liquidity-gauge-v4 -p curve-erc20 -p minter -p voting-escrow -p gauge-controller -p erc20-crv  --target wasm32-unknown-unknown
 	wasm-strip target/wasm32-unknown-unknown/release/liquidity-gauge-v4.wasm 2>/dev/null | true
 build-contract-vesting-escrow-simple:
 	cargo build --release -p curve-erc20 -p vesting-escrow-simple --target wasm32-unknown-unknown
@@ -296,7 +296,7 @@ copy-wasm-file-liquidity-gauge-v4:
 	cp ${root_directory}${wasm_src_path}gauge-controller-token.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}minter-token.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${root_directory}${wasm_src_path}voting-escrow.wasm ${liquidity_gauge_v4_des_wasm}
-	cp ${root_directory}${wasm_src_path}liquidity_gauge_v3_session_code.wasm ${liquidity_gauge_v3_des_wasm}
+	cp ${root_directory}${wasm_src_path}liquidity_gauge_v4_session_code.wasm ${liquidity_gauge_v4_des_wasm}
 	cp ${wasm_src_path}/test-session-code.wasm ${liquidity_gauge_v4_des_wasm}
 copy-wasm-file-ownable:
 	cp ${wasm_src_path}/ownable.wasm ${ownable_des_wasm}
@@ -353,7 +353,7 @@ test-curve-rewards:
 test-liquidity-gauge-v3: 
 	make build-contract-liquidity-gauge-v3 && make copy-wasm-file-liquidity-gauge-v3 && make test-only-liquidity-gauge-v3
 test-liquidity-gauge-v4:
-	make build-contract-liquidity-gauge-v3 && make copy-wasm-file-liquidity-gauge-v4 && make test-only-liquidity-gauge-v4
+	make build-contract-liquidity-gauge-v4 && make copy-wasm-file-liquidity-gauge-v4 && make test-only-liquidity-gauge-v4
 
 all:
 	make test-curve-token-v3

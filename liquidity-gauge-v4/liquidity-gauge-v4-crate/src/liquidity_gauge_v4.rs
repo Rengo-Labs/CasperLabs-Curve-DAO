@@ -4,6 +4,7 @@ use crate::data::{
 };
 use crate::{alloc::string::ToString, event::*};
 use alloc::{collections::BTreeMap, string::String};
+use alloc::format;
 use casper_contract::{
     contract_api::{runtime, storage},
     unwrap_or_revert::UnwrapOrRevert,
@@ -299,6 +300,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         }
     }
     fn _checkpoint(&mut self, addr: Key) {
+        runtime::print("_checkpoint");
         let token: Key = data::get_crv_token();
         let controller: Key = data::get_controller();
         let mut period: i128 = data::get_period();
@@ -308,7 +310,11 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         let mut rate: U256 = data::get_inflation_rate();
         let mut new_rate: U256 = rate;
         let prev_future_epoch: U256 = data::get_future_epoch_time();
+        runtime::print("after load");
+        runtime::print(&format!("prev_future_epoch {:?}", prev_future_epoch));
+        runtime::print(&format!("period_time {:?}", period_time));
         if prev_future_epoch >= period_time {
+            runtime::print("future_epoch_time");
             data::set_future_epoch_time(runtime::call_versioned_contract(
                 token.into_hash().unwrap_or_revert().into(),
                 None,
@@ -322,16 +328,19 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 runtime_args! {},
             );
             data::set_inflation_rate(new_rate);
+            runtime::print(&format!("new_rate {:?}", new_rate));
         }
+        runtime::print("after call");
         if data::get_is_killed() {
             rate = 0.into();
         }
         let block_timestamp: u64 = runtime::get_blocktime().into();
-        let mut prev_week_time: U256 = 0.into();
-        let mut working_supply: U256 = 0.into();
-        let mut week_time: U256 = 0.into();
+        
+        runtime::print(&format!("block_timestamp {:?}", block_timestamp));
+        runtime::print(&format!("period_time {:?}", period_time));
         if U256::from(block_timestamp) > period_time {
-            working_supply = data::get_working_supply();
+            runtime::print("checkpoint_gauge");
+            let mut working_supply = data::get_working_supply();
             let () = runtime::call_versioned_contract(
                 controller.into_hash().unwrap_or_revert().into(),
                 None,
@@ -340,8 +349,8 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                     "addr" => Key::from(data::get_package_hash())
                 },
             );
-            prev_week_time = period_time;
-            week_time = U256::min(
+            let mut prev_week_time = period_time;
+            let mut week_time = U256::min(
                 (period_time
                     .checked_add(data::WEEK)
                     .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError18))
@@ -351,79 +360,95 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError20),
                 U256::from(block_timestamp),
             );
-        }
-        for _ in 0..500 {
-            let dt: U256 = week_time
-                .checked_sub(prev_week_time)
-                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError21);
-            let w: U256 = runtime::call_versioned_contract(
-                controller.into_hash().unwrap_or_revert().into(),
-                None,
-                "gauge_relative_weight",
-                runtime_args! {
-                    "addr" => Key::from(data::get_package_hash()),
-                    "time" => Some(prev_week_time.checked_div(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError22).checked_mul(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError23))
-                },
-            );
-            if working_supply > 0.into() {
-                if (prev_future_epoch >= prev_week_time) && (prev_future_epoch < week_time) {
-                    integrate_inv_supply = integrate_inv_supply
-                        .checked_add(
-                            rate.checked_mul(w)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError24)
-                                .checked_mul(
-                                    prev_future_epoch
-                                        .checked_sub(prev_week_time)
-                                        .unwrap_or_revert_with(
-                                            Error::LiquidityGaugeArithmeticError25,
-                                        ),
-                                )
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError26)
-                                .checked_div(working_supply)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError27),
-                        )
-                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError28);
-                    rate = new_rate;
-                    integrate_inv_supply = integrate_inv_supply
-                        .checked_add(
-                            rate.checked_mul(w)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError29)
-                                .checked_mul(
-                                    week_time
-                                        .checked_sub(prev_future_epoch)
-                                        .unwrap_or_revert_with(
-                                            Error::LiquidityGaugeArithmeticError30,
-                                        ),
-                                )
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError31)
-                                .checked_div(working_supply)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError32),
-                        )
-                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError33);
-                } else {
-                    integrate_inv_supply = integrate_inv_supply
-                        .checked_add(
-                            rate.checked_mul(w)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError34)
-                                .checked_mul(dt)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError35)
-                                .checked_div(working_supply)
-                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError36),
-                        )
-                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError37);
+            
+            runtime::print(&format!("working_supply {:?}", working_supply));
+            runtime::print(&format!("prev_week_time {:?}", prev_week_time));
+            runtime::print(&format!("period_time {:?}", period_time));
+            runtime::print(&format!("week_time {:?}", week_time));
+
+            for i in 0..500 {
+                runtime::print(&format!("i {:?}", i));
+                let dt: U256 = week_time
+                    .checked_sub(prev_week_time)
+                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError21);
+                let w: U256 = runtime::call_versioned_contract(
+                    controller.into_hash().unwrap_or_revert().into(),
+                    None,
+                    "gauge_relative_weight",
+                    runtime_args! {
+                        "addr" => Key::from(data::get_package_hash()),
+                        "time" => Some(prev_week_time.checked_div(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError22).checked_mul(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError23))
+                    },
+                );
+                runtime::print(&format!("working_supply {:?}", working_supply));
+                if working_supply > 0.into() {
+                    runtime::print("working supply");
+                    if (prev_future_epoch >= prev_week_time) && (prev_future_epoch < week_time) {
+                        runtime::print("epochs");
+                        integrate_inv_supply = integrate_inv_supply
+                            .checked_add(
+                                rate.checked_mul(w)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError24)
+                                    .checked_mul(
+                                        prev_future_epoch
+                                            .checked_sub(prev_week_time)
+                                            .unwrap_or_revert_with(
+                                                Error::LiquidityGaugeArithmeticError25,
+                                            ),
+                                    )
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError26)
+                                    .checked_div(working_supply)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError27),
+                            )
+                            .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError28);
+                        rate = new_rate;
+                        integrate_inv_supply = integrate_inv_supply
+                            .checked_add(
+                                rate.checked_mul(w)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError29)
+                                    .checked_mul(
+                                        week_time
+                                            .checked_sub(prev_future_epoch)
+                                            .unwrap_or_revert_with(
+                                                Error::LiquidityGaugeArithmeticError30,
+                                            ),
+                                    )
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError31)
+                                    .checked_div(working_supply)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError32),
+                            )
+                            .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError33);
+                    } else {
+                        runtime::print("epochs else");
+                        integrate_inv_supply = integrate_inv_supply
+                            .checked_add(
+                                rate.checked_mul(w)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError34)
+                                    .checked_mul(dt)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError35)
+                                    .checked_div(working_supply)
+                                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError36),
+                            )
+                            .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError37);
+                    }
                 }
+                
+                runtime::print(&format!("week_time {:?}", week_time));
+                runtime::print(&format!("block_timestamp {:?}", &block_timestamp));
+                if week_time == block_timestamp.into() {
+                    runtime::print("break");
+                    break;
+                }
+                prev_week_time = week_time;
+                week_time = U256::min(
+                    week_time
+                        .checked_add(data::WEEK)
+                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError38),
+                    block_timestamp.into(),
+                );
             }
-            if week_time == block_timestamp.into() {
-                break;
-            }
-            prev_week_time = week_time;
-            week_time = U256::min(
-                week_time
-                    .checked_add(data::WEEK)
-                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError38),
-                block_timestamp.into(),
-            );
         }
+        runtime::print("loop done");
         period = period
             .checked_add(1.into())
             .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError39);
@@ -463,7 +488,9 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
     }
 
     fn claimable_tokens(&mut self, addr: Key) -> U256 {
+        runtime::print("claimable_tokens");
         self._checkpoint(addr);
+        runtime::print("after_checkpoint");
         data::IntegrateFraction::instance()
             .get(&addr)
             .checked_sub(runtime::call_versioned_contract(

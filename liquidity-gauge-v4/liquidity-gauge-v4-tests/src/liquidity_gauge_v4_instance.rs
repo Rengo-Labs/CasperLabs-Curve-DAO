@@ -52,7 +52,7 @@ impl LIQUIDITYGUAGEV4INSTANCEInstance {
     ) -> TestContract {
         TestContract::new(
             env,
-            "liquidity-gauge-V4.wasm",
+            "liquidity-gauge-v4.wasm",
             contract_name,
             sender,
             runtime_args! {

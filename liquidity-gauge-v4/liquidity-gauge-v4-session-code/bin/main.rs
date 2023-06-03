@@ -64,6 +64,7 @@ pub extern "C" fn call() {
             store(TRANSFER_FROM, ret);
         }
         CLAIMABLE_TOKENS => {
+            runtime::print("session_claimable_tokens");
             let addr: Key = runtime::get_named_arg("addr");
             let ret: U256 = runtime::call_versioned_contract(
                 package_hash.into_hash().unwrap_or_revert().into(),
@@ -74,20 +75,6 @@ pub extern "C" fn call() {
                 },
             );
             store(CLAIMABLE_TOKENS, ret);
-        }
-        CLAIMABLE_REWARD_WRITE => {
-            let addr: Key = runtime::get_named_arg("addr");
-            let token: Key = runtime::get_named_arg("token");
-            let ret: U256 = runtime::call_versioned_contract(
-                package_hash.into_hash().unwrap_or_revert().into(),
-                None,
-                CLAIMABLE_REWARD_WRITE,
-                runtime_args! {
-                    "addr"=>addr,
-                    "token"=>token,
-                },
-            );
-            store(CLAIMABLE_REWARD_WRITE, ret);
         }
         USER_CHECKPOINT => {
             let addr: Key = runtime::get_named_arg("addr");
