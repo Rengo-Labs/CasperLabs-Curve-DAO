@@ -126,17 +126,12 @@ fn claimable_reward() {
 /// @dev When set to ZERO_ADDRESS, rewards are sent to the caller
 /// @param _receiver Receiver address for any rewards claimed via `claim_rewards`
 /// """
+
 #[no_mangle]
 fn set_rewards_receiver() {
     let receiver: Key = runtime::get_named_arg("receiver");
     LiquidityGaugeV4::default().set_rewards_receiver(receiver);
 }
-///"""
-///    @notice Kick `addr` for abusing their boost
-///    @dev Only if either they had another voting event, or their voting escrow lock expired
-///    @param addr Address to kick
-///    """
-
 ///"""
 ///    @notice Claim available reward tokens for `addr`
 ///    @param addr Address to claim for
@@ -144,12 +139,19 @@ fn set_rewards_receiver() {
 ///                     ZERO_ADDRESS, uses the default reward receiver
 ///                     for the caller
 ///"""
+
 #[no_mangle]
 fn claim_rewards() {
     let addr: Option<Key> = runtime::get_named_arg("addr");
     let receiver: Option<Key> = runtime::get_named_arg("receiver");
     LiquidityGaugeV4::default().claim_rewards(addr, receiver);
 }
+///"""
+///    @notice Kick `addr` for abusing their boost
+///    @dev Only if either they had another voting event, or their voting escrow lock expired
+///    @param addr Address to kick
+///    """
+
 #[no_mangle]
 fn kick() {
     let addr: Key = runtime::get_named_arg("addr");
@@ -333,8 +335,8 @@ fn future_epoch_time() {
 }
 #[no_mangle]
 fn balance_of() {
-    let owner: Address = runtime::get_named_arg("owner");
-    let ret: U256 = CURVEERC20::balance_of(&LiquidityGaugeV4::default(), owner);
+    let address: Address = runtime::get_named_arg("address");
+    let ret: U256 = CURVEERC20::balance_of(&LiquidityGaugeV4::default(), address);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 #[no_mangle]
@@ -709,7 +711,7 @@ fn get_entry_points() -> EntryPoints {
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "balance_of",
-        vec![Parameter::new("owner", Address::cl_type())],
+        vec![Parameter::new("address", Address::cl_type())],
         U256::cl_type(),
         EntryPointAccess::Public,
         EntryPointType::Contract,

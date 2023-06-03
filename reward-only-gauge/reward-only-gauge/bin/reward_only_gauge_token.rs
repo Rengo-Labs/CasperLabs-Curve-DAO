@@ -73,9 +73,9 @@ fn future_admin() {
 
 #[no_mangle]
 fn balance_of() {
-    let owner: Address = runtime::get_named_arg("owner");
+    let address: Address = runtime::get_named_arg("address");
     runtime::ret(
-        CLValue::from_t(CURVEERC20::balance_of(&Token::default(), owner)).unwrap_or_revert(),
+        CLValue::from_t(CURVEERC20::balance_of(&Token::default(), address)).unwrap_or_revert(),
     );
 }
 #[no_mangle]
@@ -508,7 +508,7 @@ fn get_entry_points() -> EntryPoints {
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "balance_of",
-        vec![Parameter::new("owner", Address::cl_type())],
+        vec![Parameter::new("address", Address::cl_type())],
         U256::cl_type(),
         EntryPointAccess::Public,
         EntryPointType::Contract,

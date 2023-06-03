@@ -227,7 +227,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
                     None,
                     "balance_of",
                     runtime_args! {
-                        "owner" => Key::from(data::get_package_hash())
+                        "address" => Key::from(data::get_package_hash())
                     },
                 ));
             }
@@ -258,7 +258,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
                     None,
                     "balance_of",
                     runtime_args! {
-                        "owner" => Key::from(get_package_hash())
+                        "address" => Key::from(get_package_hash())
                     },
                 );
 
@@ -948,7 +948,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
                 get_lp_token().into_hash().unwrap_or_revert().into(),
                 None,
                 "balance_of",
-                runtime_args! {"owner" => Address::from(get_package_hash())},
+                runtime_args! {"address" => Address::from(get_package_hash())},
             );
             if balance_of != 0.into() {
                 runtime::revert(Error::LiquidityGaugeFailedToDeposit);
@@ -966,7 +966,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
                 get_lp_token().into_hash().unwrap_or_revert().into(),
                 None,
                 "balance_of",
-                runtime_args! {"owner" => Address::from(get_package_hash())},
+                runtime_args! {"address" => Address::from(get_package_hash())},
             );
             if balance_of != total_supply {
                 runtime::revert(Error::LiquidityGaugeFailedToWithdraw);

@@ -540,7 +540,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
                     token_package_hash,
                     None,
                     "balance_of",
-                    runtime_args! {"owner" => Address::from(data::get_package_hash())},
+                    runtime_args! {"address" => Address::from(data::get_package_hash())},
                 );
                 d_i = U256::from(1000000000)
                     * (token_balance

@@ -40,7 +40,7 @@ fn test_deploy() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::Hash(contract.package_hash()),
-            "owner"=>Address::from(owner)
+            "address"=>Address::from(owner)
         },
         time_now,
     );
@@ -228,7 +228,7 @@ fn test_mint() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::Hash(contract.package_hash()),
-            "owner"=>Address::Account(to)
+            "address"=>Address::Account(to)
         },
         0,
     );
@@ -310,7 +310,7 @@ fn test_transfer() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::Hash(contract.package_hash()),
-            "owner"=>Key::from(owner)
+            "address"=>Key::from(owner)
         },
         time_now,
     );
@@ -333,7 +333,7 @@ fn test_transfer_from() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::Hash(contract.package_hash()),
-            "owner"=>Key::from(owner)
+            "address"=>Key::from(owner)
         },
         time_now,
     );

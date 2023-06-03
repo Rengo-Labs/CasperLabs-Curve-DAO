@@ -337,7 +337,7 @@ mod deposit_withdraw_kill_me_and_approve_test_cases {
             runtime_args! {
                 "entrypoint" => String::from(BALANCE_OF),
                 "package_hash" => Key::Hash(erc20.package_hash()),
-                "owner" => Key::Account(owner)
+                "address" => Key::Account(owner)
             },
             blocktime,
         );
@@ -508,7 +508,7 @@ mod panic_test_cases {
             runtime_args! {
                 "entrypoint" => String::from(BALANCE_OF),
                 "package_hash" => Key::Hash(instance.package_hash()),
-                "owner" => Key::Account(owner)
+                "address" => Key::Account(owner)
             },
             blocktime,
         );

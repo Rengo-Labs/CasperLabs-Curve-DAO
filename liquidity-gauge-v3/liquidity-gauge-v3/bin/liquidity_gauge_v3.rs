@@ -365,8 +365,8 @@ fn future_epoch_time() {
 }
 #[no_mangle]
 fn balance_of() {
-    let owner: Address = runtime::get_named_arg("owner");
-    let ret: U256 = CURVEERC20::balance_of(&LiquidityGaugeV3::default(), owner);
+    let address: Address = runtime::get_named_arg("address");
+    let ret: U256 = CURVEERC20::balance_of(&LiquidityGaugeV3::default(), address);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 #[no_mangle]
@@ -746,7 +746,7 @@ fn get_entry_points() -> EntryPoints {
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "balance_of",
-        vec![Parameter::new("owner", Address::cl_type())],
+        vec![Parameter::new("address", Address::cl_type())],
         U256::cl_type(),
         EntryPointAccess::Public,
         EntryPointType::Contract,

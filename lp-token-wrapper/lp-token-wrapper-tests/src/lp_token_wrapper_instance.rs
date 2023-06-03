@@ -41,7 +41,7 @@ impl LPTOKENWRAPPERInstance {
             sender,
             "balance_of",
             runtime_args! {
-                "account" => account
+                "address" => account
             },
             LPTOKENWRAPPERInstance::now(),
         );
