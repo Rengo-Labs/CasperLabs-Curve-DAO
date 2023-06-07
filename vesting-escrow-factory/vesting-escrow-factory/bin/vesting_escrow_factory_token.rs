@@ -181,8 +181,8 @@ fn vested_of() {
 }
 #[no_mangle]
 fn balance_of() {
-    let recipient: Key = runtime::get_named_arg("recipient");
-    let ret = VESTINGESCROWSIMPLE::balance_of(&Token::default(), recipient);
+    let address: Key = runtime::get_named_arg("address");
+    let ret = VESTINGESCROWSIMPLE::balance_of(&Token::default(), address);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 #[no_mangle]
@@ -522,7 +522,7 @@ fn get_entry_points() -> EntryPoints {
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "balance_of",
-        vec![Parameter::new("recipient", Key::cl_type())],
+        vec![Parameter::new("address", Key::cl_type())],
         U256::cl_type(),
         EntryPointAccess::Public,
         EntryPointType::Contract,

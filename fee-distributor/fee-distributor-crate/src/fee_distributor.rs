@@ -60,7 +60,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
             None,
             "balance_of",
             runtime_args! {
-                "owner" => Address::from(Key::from(get_package_hash()))
+                "address" => Address::from(Key::from(get_package_hash()))
             },
         );
         let to_distribute: U256 = token_balance
@@ -639,7 +639,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
             None,
             "balance_of",
             runtime_args! {
-                "owner" => Address::from(self.get_caller())
+                "address" => Address::from(self.get_caller())
             },
         );
         if amount != 0.into() {
@@ -720,7 +720,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
             None,
             "balance_of",
             runtime_args! {
-                "owner" => Address::from(Key::from(get_package_hash()))
+                "address" => Address::from(Key::from(get_package_hash()))
             },
         );
         let () = runtime::call_versioned_contract(
@@ -750,7 +750,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
             None,
             "balance_of",
             runtime_args! {
-                "owner" => Address::from(Key::from(get_package_hash()))
+                "address" => Address::from(Key::from(get_package_hash()))
             },
         );
         let () = runtime::call_versioned_contract(

@@ -1,0 +1,18 @@
+[package]
+name = "liquidity-gauge-v4-session-code"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+casper-types = "1.5.0"
+common = { path = "../../common" }
+casper-contract = { version = "1.4.4", default-features = false, features = [
+  "test-support",
+] }
+
+[[bin]]
+name = "liquidity_gauge_v4_session_code"
+path = "bin/main.rs"
+bench = false
+doctest = false
+test = false

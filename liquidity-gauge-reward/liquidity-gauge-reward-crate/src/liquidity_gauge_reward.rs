@@ -193,7 +193,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
                 None,
                 "balance_of",
                 runtime_args! {
-                    "owner" => Key::from(get_package_hash())
+                    "address" => Key::from(get_package_hash())
                 },
             );
             let () = runtime::call_versioned_contract(
@@ -207,7 +207,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
                 None,
                 "balance_of",
                 runtime_args! {
-                    "owner" => Key::from(get_package_hash())
+                    "address" => Key::from(get_package_hash())
                 },
             );
             d_reward = _d_reward

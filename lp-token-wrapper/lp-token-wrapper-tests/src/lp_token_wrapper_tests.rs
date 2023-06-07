@@ -88,7 +88,7 @@ fn balance_of() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         LPTOKENWRAPPERInstance::now(),
     );
@@ -110,7 +110,7 @@ fn stake() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         LPTOKENWRAPPERInstance::now(),
     );
@@ -134,7 +134,7 @@ fn withdraw() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         LPTOKENWRAPPERInstance::now(),
     );

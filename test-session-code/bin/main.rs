@@ -73,13 +73,13 @@ pub extern "C" fn call() {
             store(ALLOWANCE, ret);
         }
         BALANCE_OF => {
-            let owner: Key = runtime::get_named_arg("owner");
+            let owner: Key = runtime::get_named_arg("address");
             let ret: U256 = runtime::call_versioned_contract(
                 package_hash.into_hash().unwrap_or_revert().into(),
                 None,
                 BALANCE_OF,
                 runtime_args! {
-                    "owner" => owner,
+                    "address" => owner,
                 },
             );
             store(BALANCE_OF, ret);

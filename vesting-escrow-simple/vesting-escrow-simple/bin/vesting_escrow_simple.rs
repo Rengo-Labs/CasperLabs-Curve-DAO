@@ -78,8 +78,8 @@ fn vested_of() {
 }
 #[no_mangle]
 fn balance_of() {
-    let recipient: Key = runtime::get_named_arg("recipient");
-    let ret = VestingEscrowSimple::default().balance_of(recipient);
+    let address: Key = runtime::get_named_arg("address");
+    let ret = VestingEscrowSimple::default().balance_of(address);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 #[no_mangle]

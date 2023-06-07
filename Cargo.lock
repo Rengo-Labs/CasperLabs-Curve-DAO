@@ -1673,6 +1673,60 @@ dependencies = [
 ]
 
 [[package]]
+name = "liquidity-gauge-v4"
+version = "0.2.0"
+dependencies = [
+ "casper-contract",
+ "casper-types",
+ "casperlabs-contract-utils 0.2.2",
+ "crv20",
+ "curve-casper-erc20",
+ "liquidity-gauge-v4-crate",
+]
+
+[[package]]
+name = "liquidity-gauge-v4-crate"
+version = "0.2.0"
+dependencies = [
+ "casper-contract",
+ "casper-types",
+ "casper_types_derive",
+ "casperlabs-contract-utils 0.2.2",
+ "common",
+ "crv20",
+ "cryptoxide",
+ "curve-casper-erc20",
+ "hex",
+ "renvm-sig",
+]
+
+[[package]]
+name = "liquidity-gauge-v4-session-code"
+version = "0.1.0"
+dependencies = [
+ "casper-contract",
+ "casper-types",
+ "common",
+]
+
+[[package]]
+name = "liquidity-gauge-v4-tests"
+version = "0.2.1"
+dependencies = [
+ "base64 0.13.1",
+ "blake2",
+ "casper-contract",
+ "casper-engine-test-support",
+ "casper-types",
+ "casper_types_derive",
+ "casperlabs-contract-utils 0.2.2",
+ "casperlabs-test-env 0.3.0",
+ "common",
+ "crv20",
+ "hex",
+]
+
+[[package]]
 name = "liquidity-gauge-wrapper"
 version = "0.2.0"
 dependencies = [

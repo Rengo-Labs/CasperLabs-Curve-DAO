@@ -1357,6 +1357,52 @@ pub enum Error {
     GaugeProxyIsLocked2 = 11982,
     /// (Gauge Proxy Is Locked)
     GaugeProxyIsLocked3 = 11983,
+
+    //LIQUIDITY GUAGE V3
+    /// (Liquidity Gauge V4 error 1)
+    LiquidityGaugeV4RewardCountExceedsMax = 11984,
+    /// (Liquidity Gauge V4 error 2)
+    LiquidityGaugeV4RewardDataExists1 = 11985,
+    /// (Liquidity Gauge V4 error 3)
+    LiquidityGaugeV4AddRewardAdditionOverFlow = 11986,
+    /// (Liquidity Gauge V4 error 4)
+    LiquidityGaugeV4CurrentDistributorExists1 = 11987,
+    /// (Liquidity Gauge V4 error 5)
+    LiquidityGaugeV4NewDistributorExists1 = 11988,
+    /// (Liquidity Gauge V4 error 6)
+    LiquidityGaugeOnlyAdminOrDistributor = 11989,
+    /// (Liquidity Gauge V4 error 7)
+    LiquidityGaugeOnlyDistributor = 11990,
+    /// (Liquidity Gauge V4 error 8)
+    LiquidityGaugeV4DepositRewardTokensSubtractionOverFlow = 11991,
+    /// (Liquidity Gauge V4 error 9)
+    LiquidityGaugeV4DepositRewardTokensMultiplicationOverFlow = 11992,    
+    /// (Liquidity Gauge V4 error 10)
+    LiquidityGaugeV4DepositRewardTokensAdditionOverFlow1 = 11993,
+    /// (Liquidity Gauge V4 error 11)
+    LiquidityGaugeV4CheckpointRewardsSubtractionOverFlow = 11994,
+    /// (Liquidity Gauge V4 error 12)
+    LiquidityGaugeV4CheckpointRewardsMultiplicationOverFlow1 = 11995,
+    /// (Liquidity Gauge V4 error 13)
+    LiquidityGaugeV4CheckpointRewardsMultiplicationOverFlow2 = 11996,
+    /// (Liquidity Gauge V4 error 14)
+    LiquidityGaugeV4CheckpointRewardsAdditionOverFlow = 11997,
+    /// (Liquidity Gauge V4 error 15)
+    LiquidityGaugeV4DepositRewardTokensAdditionOverFlow2 = 11998,
+    /// (Liquidity Gauge V4 error 16)
+    LiquidityGaugeV4ClaimableRewardSubtractionOverFlow1 = 11999,
+    /// (Liquidity Gauge V4 error 17)
+    LiquidityGaugeV4ClaimableRewardAdditionOverFlow1 = 11200,
+    /// (Liquidity Gauge V4 error 18)
+    LiquidityGaugeV4ClaimableRewardAdditionOverFlow2 = 12001,
+    /// (Liquidity Gauge V4 error 19)
+    LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow1 = 12002,
+    /// (Liquidity Gauge V4 error 20)
+    LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow2 = 12003,
+    /// (Liquidity Gauge V4 error 21)
+    LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow3 = 12004,
+    /// (Liquidity Gauge V4 error 22)
+    LiquidityGaugeV4ClaimableRewardSubtractionOverFlow2 = 12005,
 }
 
 impl From<Error> for ApiError {

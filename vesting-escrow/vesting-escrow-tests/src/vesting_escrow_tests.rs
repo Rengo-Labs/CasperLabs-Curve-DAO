@@ -996,7 +996,7 @@ fn test_vesting_escrow_balance_of() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::from(vesting_escrow_instance.package_hash()),
-            "owner" => Key::Account(user_1),
+            "address" => Key::Account(user_1),
         },
         time_now + MILLI_SECONDS_IN_DAY * 365,
     );
@@ -1011,7 +1011,7 @@ fn test_vesting_escrow_balance_of() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::from(vesting_escrow_instance.package_hash()),
-            "owner" => Key::Account(user_2),
+            "address" => Key::Account(user_2),
         },
         time_now + MILLI_SECONDS_IN_DAY * 365,
     );
@@ -1026,7 +1026,7 @@ fn test_vesting_escrow_balance_of() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::from(vesting_escrow_instance.package_hash()),
-            "owner" => Key::Account(user_3),
+            "address" => Key::Account(user_3),
         },
         time_now + MILLI_SECONDS_IN_DAY * 365,
     );
@@ -1041,7 +1041,7 @@ fn test_vesting_escrow_balance_of() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => Key::from(vesting_escrow_instance.package_hash()),
-            "owner" => Key::Account(user_4),
+            "address" => Key::Account(user_4),
         },
         time_now + MILLI_SECONDS_IN_DAY * 365,
     );

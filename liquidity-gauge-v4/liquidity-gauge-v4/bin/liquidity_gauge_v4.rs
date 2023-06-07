@@ -2,7 +2,6 @@
 #![no_std]
 extern crate alloc;
 
-use crate::vec::Vec;
 use alloc::{
     boxed::Box,
     collections::BTreeSet,
@@ -20,19 +19,19 @@ use casper_types::{
 };
 use casperlabs_contract_utils::{ContractContext, OnChainContractStorage};
 use crv20::{self, Address, CURVEERC20};
-use liquidity_gauge_v3_crate::{self, data, utils::*, LIQUIDITYTGAUGEV3};
+use liquidity_gauge_v4_crate::{self, data, utils::*, LIQUIDITYTGAUGEV4};
 #[derive(Default)]
-struct LiquidityGaugeV3(OnChainContractStorage);
+struct LiquidityGaugeV4(OnChainContractStorage);
 
-impl ContractContext<OnChainContractStorage> for LiquidityGaugeV3 {
+impl ContractContext<OnChainContractStorage> for LiquidityGaugeV4 {
     fn storage(&self) -> &OnChainContractStorage {
         &self.0
     }
 }
-impl CURVEERC20<OnChainContractStorage> for LiquidityGaugeV3 {}
-impl LIQUIDITYTGAUGEV3<OnChainContractStorage> for LiquidityGaugeV3 {}
+impl CURVEERC20<OnChainContractStorage> for LiquidityGaugeV4 {}
+impl LIQUIDITYTGAUGEV4<OnChainContractStorage> for LiquidityGaugeV4 {}
 
-impl LiquidityGaugeV3 {
+impl LiquidityGaugeV4 {
     fn constructor(
         &mut self,
         lp_addr: Key,
@@ -41,7 +40,7 @@ impl LiquidityGaugeV3 {
         contract_hash: ContractHash,
         package_hash: ContractPackageHash,
     ) {
-        LIQUIDITYTGAUGEV3::init(self, lp_addr, minter, admin, contract_hash, package_hash);
+        LIQUIDITYTGAUGEV4::init(self, lp_addr, minter, admin, contract_hash, package_hash);
     }
 }
 #[no_mangle]
@@ -51,7 +50,7 @@ fn constructor() {
     let admin: Key = runtime::get_named_arg("admin");
     let contract_hash: ContractHash = runtime::get_named_arg("contract_hash");
     let package_hash: ContractPackageHash = runtime::get_named_arg("package_hash");
-    LiquidityGaugeV3::default().constructor(lp_addr, minter, admin, contract_hash, package_hash);
+    LiquidityGaugeV4::default().constructor(lp_addr, minter, admin, contract_hash, package_hash);
 }
 /// """
 /// @notice Get the number of decimals for this token
@@ -60,13 +59,13 @@ fn constructor() {
 /// """
 #[no_mangle]
 fn decimals() {
-    let ret: u8 = LiquidityGaugeV3::default().decimals();
+    let ret: u8 = LiquidityGaugeV4::default().decimals();
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 
 #[no_mangle]
 fn integrate_checkpoint() {
-    let ret: U256 = LiquidityGaugeV3::default().integrate_checkpoint();
+    let ret: U256 = LiquidityGaugeV4::default().integrate_checkpoint();
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 
@@ -78,7 +77,7 @@ fn integrate_checkpoint() {
 #[no_mangle]
 fn user_checkpoint() {
     let addr: Key = runtime::get_named_arg("addr");
-    let ret: bool = LiquidityGaugeV3::default().user_checkpoint(addr);
+    let ret: bool = LiquidityGaugeV4::default().user_checkpoint(addr);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 ///"""
@@ -88,25 +87,7 @@ fn user_checkpoint() {
 #[no_mangle]
 fn claimable_tokens() {
     let addr: Key = runtime::get_named_arg("addr");
-    let ret: U256 = LiquidityGaugeV3::default().claimable_tokens(addr);
-    runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
-}
-/// """
-/// @notice Address of the reward contract providing non-CRV incentives for this gauge
-/// @dev Returns `ZERO_ADDRESS` if there is no reward contract active
-/// """
-#[no_mangle]
-fn reward_contract() {
-    let ret = LiquidityGaugeV3::default().reward_contract();
-    runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
-}
-/// """
-/// @notice Epoch timestamp of the last call to claim from `reward_contract`
-/// @dev Rewards are claimed at most once per hour in order to reduce gas costs
-/// """
-#[no_mangle]
-fn last_claim() {
-    let ret = LiquidityGaugeV3::default().last_claim();
+    let ret: U256 = LiquidityGaugeV4::default().claimable_tokens(addr);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 /// """
@@ -119,7 +100,7 @@ fn last_claim() {
 fn claimed_reward() {
     let addr: Key = runtime::get_named_arg("addr");
     let token: Key = runtime::get_named_arg("token");
-    let ret = LiquidityGaugeV3::default().claimed_reward(addr, token);
+    let ret = LiquidityGaugeV4::default().claimed_reward(addr, token);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 /// """
@@ -137,22 +118,7 @@ fn claimable_reward() {
     let addr: Key = runtime::get_named_arg("addr");
     let token: Key = runtime::get_named_arg("token");
 
-    let ret: U256 = LiquidityGaugeV3::default().claimable_reward(addr, token);
-    runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
-}
-/// """
-/// @notice Get the number of claimable reward tokens for a user
-/// @dev This function should be manually changed to "view" in the ABI
-///      Calling it via a transaction will claim available reward tokens
-/// @param _addr Account to get reward amount for
-/// @param _token Token to get reward amount for
-/// @return uint256 Claimable reward token amount
-/// """
-#[no_mangle]
-fn claimable_reward_write() {
-    let addr: Key = runtime::get_named_arg("addr");
-    let token: Key = runtime::get_named_arg("token");
-    let ret: U256 = LiquidityGaugeV3::default().claimable_reward_write(addr, token);
+    let ret: U256 = LiquidityGaugeV4::default().claimable_reward(addr, token);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 /// """
@@ -160,17 +126,12 @@ fn claimable_reward_write() {
 /// @dev When set to ZERO_ADDRESS, rewards are sent to the caller
 /// @param _receiver Receiver address for any rewards claimed via `claim_rewards`
 /// """
+
 #[no_mangle]
 fn set_rewards_receiver() {
     let receiver: Key = runtime::get_named_arg("receiver");
-    LiquidityGaugeV3::default().set_rewards_receiver(receiver);
+    LiquidityGaugeV4::default().set_rewards_receiver(receiver);
 }
-///"""
-///    @notice Kick `addr` for abusing their boost
-///    @dev Only if either they had another voting event, or their voting escrow lock expired
-///    @param addr Address to kick
-///    """
-
 ///"""
 ///    @notice Claim available reward tokens for `addr`
 ///    @param addr Address to claim for
@@ -178,16 +139,23 @@ fn set_rewards_receiver() {
 ///                     ZERO_ADDRESS, uses the default reward receiver
 ///                     for the caller
 ///"""
+
 #[no_mangle]
 fn claim_rewards() {
     let addr: Option<Key> = runtime::get_named_arg("addr");
     let receiver: Option<Key> = runtime::get_named_arg("receiver");
-    LiquidityGaugeV3::default().claim_rewards(addr, receiver);
+    LiquidityGaugeV4::default().claim_rewards(addr, receiver);
 }
+///"""
+///    @notice Kick `addr` for abusing their boost
+///    @dev Only if either they had another voting event, or their voting escrow lock expired
+///    @param addr Address to kick
+///    """
+
 #[no_mangle]
 fn kick() {
     let addr: Key = runtime::get_named_arg("addr");
-    LiquidityGaugeV3::default().kick(addr);
+    LiquidityGaugeV4::default().kick(addr);
 }
 /// """
 /// @notice Deposit `_value` LP tokens
@@ -201,7 +169,7 @@ fn deposit() {
     let value: U256 = runtime::get_named_arg("value");
     let addr: Option<Key> = runtime::get_named_arg("addr");
     let claim_rewards: Option<bool> = runtime::get_named_arg("claim_rewards");
-    LiquidityGaugeV3::default().deposit(value, addr, claim_rewards);
+    LiquidityGaugeV4::default().deposit(value, addr, claim_rewards);
 }
 /// """
 /// @notice Withdraw `value` LP tokens
@@ -213,7 +181,7 @@ fn withdraw() {
     let value: U256 = runtime::get_named_arg("value");
     let claim_rewards: Option<bool> = runtime::get_named_arg("claim_rewards");
 
-    LiquidityGaugeV3::default().withdraw(value, claim_rewards);
+    LiquidityGaugeV4::default().withdraw(value, claim_rewards);
 }
 /// """
 /// @notice Transfer token for a specified address
@@ -226,7 +194,7 @@ fn withdraw() {
 fn transfer() {
     let recipient: Address = runtime::get_named_arg("recipient");
     let amount: U256 = runtime::get_named_arg("amount");
-    LIQUIDITYTGAUGEV3::transfer(&mut LiquidityGaugeV3::default(), recipient, amount)
+    LIQUIDITYTGAUGEV4::transfer(&mut LiquidityGaugeV4::default(), recipient, amount)
         .unwrap_or_revert();
 }
 /// """
@@ -241,7 +209,7 @@ fn transfer_from() {
     let owner: Address = runtime::get_named_arg("owner");
     let recipient: Address = runtime::get_named_arg("recipient");
     let amount: U256 = runtime::get_named_arg("amount");
-    LIQUIDITYTGAUGEV3::transfer_from(&mut LiquidityGaugeV3::default(), owner, recipient, amount)
+    LIQUIDITYTGAUGEV4::transfer_from(&mut LiquidityGaugeV4::default(), owner, recipient, amount)
         .unwrap_or_revert();
 }
 
@@ -257,7 +225,7 @@ fn transfer_from() {
 fn approve() {
     let spender: Address = runtime::get_named_arg("spender");
     let amount: U256 = runtime::get_named_arg("amount");
-    LIQUIDITYTGAUGEV3::approve(&LiquidityGaugeV3::default(), spender, amount).unwrap_or_revert();
+    LIQUIDITYTGAUGEV4::approve(&LiquidityGaugeV4::default(), spender, amount).unwrap_or_revert();
 }
 ///@notice Increase the allowance granted to `spender` by the caller
 ///    @dev This is alternative to {approve} that can be used as a mitigation for
@@ -269,7 +237,7 @@ fn approve() {
 fn increase_allowance() {
     let spender: Address = runtime::get_named_arg("spender");
     let amount: U256 = runtime::get_named_arg("amount");
-    LIQUIDITYTGAUGEV3::increase_allowance(&LiquidityGaugeV3::default(), spender, amount)
+    LIQUIDITYTGAUGEV4::increase_allowance(&LiquidityGaugeV4::default(), spender, amount)
         .unwrap_or_revert();
 }
 
@@ -283,31 +251,33 @@ fn increase_allowance() {
 fn decrease_allowance() {
     let spender: Address = runtime::get_named_arg("spender");
     let amount: U256 = runtime::get_named_arg("amount");
-    LIQUIDITYTGAUGEV3::decrease_allowance(&LiquidityGaugeV3::default(), spender, amount)
+    LIQUIDITYTGAUGEV4::decrease_allowance(&LiquidityGaugeV4::default(), spender, amount)
         .unwrap_or_revert();
 }
 /// """
 /// @notice Set the active reward contract
-/// @dev A reward contract cannot be set while this contract has no deposits
-/// @param _reward_contract Reward contract address. Set to ZERO_ADDRESS to
-///                         disable staking.
-/// @param _claim_sig Four byte selectors for staking, withdrawing and claiming,
-///             left padded with zero bytes. If the reward contract can
-///             be claimed from but does not require staking, the staking
-///             and withdraw selectors should be set to 0x00
-/// @param _reward_tokens List of claimable reward tokens. New reward tokens
-///                     may be added but they cannot be removed. When calling
-///                     this function to unset or modify a reward contract,
-///                     this array must begin with the already-set reward
-///                     token addresses.
 /// """
 #[no_mangle]
-fn set_rewards() {
-    let reward_contract: Key = runtime::get_named_arg("reward_contract");
-    let sigs: String = runtime::get_named_arg("sigs");
-    let reward_tokens: Vec<String> = runtime::get_named_arg("reward_tokens");
-    LiquidityGaugeV3::default().set_rewards(reward_contract, sigs, reward_tokens);
+fn add_reward() {
+    let reward_token: Key = runtime::get_named_arg("reward_token");
+    let distributor: Key = runtime::get_named_arg("distributor");
+    LiquidityGaugeV4::default().add_reward(reward_token, distributor);
 }
+
+#[no_mangle]
+fn set_reward_distributor() {
+    let reward_token: Key = runtime::get_named_arg("reward_token");
+    let distributor: Key = runtime::get_named_arg("distributor");
+    LiquidityGaugeV4::default().set_reward_distributor(reward_token, distributor);
+}
+
+#[no_mangle]
+fn deposit_reward_token() {
+    let reward_token: Key = runtime::get_named_arg("reward_token");
+    let amount: U256 = runtime::get_named_arg("amount");
+    LiquidityGaugeV4::default().deposit_reward_token(reward_token, amount);
+}
+
 ///"""
 ///    @notice Set the killed status for this contract
 ///    @dev When killed, the gauge always yields a rate of 0 and so cannot mint CRV
@@ -316,7 +286,7 @@ fn set_rewards() {
 #[no_mangle]
 fn set_killed() {
     let is_killed: bool = runtime::get_named_arg("is_killed");
-    LiquidityGaugeV3::default().set_killed(is_killed);
+    LiquidityGaugeV4::default().set_killed(is_killed);
 }
 /// """
 /// @notice Transfer ownership of GaugeController to `addr`
@@ -326,7 +296,7 @@ fn set_killed() {
 #[no_mangle]
 fn commit_transfer_ownership() {
     let addr: Key = runtime::get_named_arg("addr");
-    LiquidityGaugeV3::default().commit_transfer_ownership(addr);
+    LiquidityGaugeV4::default().commit_transfer_ownership(addr);
 }
 
 // /// """
@@ -335,7 +305,7 @@ fn commit_transfer_ownership() {
 
 #[no_mangle]
 fn accept_transfer_ownership() {
-    LiquidityGaugeV3::default().accept_transfer_ownership();
+    LiquidityGaugeV4::default().accept_transfer_ownership();
 }
 
 // public Variables
@@ -366,12 +336,12 @@ fn future_epoch_time() {
 #[no_mangle]
 fn balance_of() {
     let address: Address = runtime::get_named_arg("address");
-    let ret: U256 = CURVEERC20::balance_of(&LiquidityGaugeV3::default(), address);
+    let ret: U256 = CURVEERC20::balance_of(&LiquidityGaugeV4::default(), address);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 #[no_mangle]
 fn total_supply() {
-    let ret: U256 = LiquidityGaugeV3::default().total_supply();
+    let ret: U256 = LiquidityGaugeV4::default().total_supply();
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 #[no_mangle]
@@ -380,7 +350,7 @@ fn allowance() {
     let spender: Address = runtime::get_named_arg("spender");
     runtime::ret(
         CLValue::from_t(CURVEERC20::allowance(
-            &LiquidityGaugeV3::default(),
+            &LiquidityGaugeV4::default(),
             owner,
             spender,
         ))
@@ -390,13 +360,13 @@ fn allowance() {
 #[no_mangle]
 fn name() {
     runtime::ret(
-        CLValue::from_t(CURVEERC20::name(&LiquidityGaugeV3::default())).unwrap_or_revert(),
+        CLValue::from_t(CURVEERC20::name(&LiquidityGaugeV4::default())).unwrap_or_revert(),
     );
 }
 #[no_mangle]
 fn symbol() {
     runtime::ret(
-        CLValue::from_t(CURVEERC20::symbol(&LiquidityGaugeV3::default())).unwrap_or_revert(),
+        CLValue::from_t(CURVEERC20::symbol(&LiquidityGaugeV4::default())).unwrap_or_revert(),
     );
 }
 #[no_mangle]
@@ -529,20 +499,6 @@ fn get_entry_points() -> EntryPoints {
         EntryPointType::Contract,
     ));
     entry_points.add_entry_point(EntryPoint::new(
-        "reward_contract",
-        vec![],
-        Key::cl_type(),
-        EntryPointAccess::Public,
-        EntryPointType::Contract,
-    ));
-    entry_points.add_entry_point(EntryPoint::new(
-        "last_claim",
-        vec![],
-        U256::cl_type(),
-        EntryPointAccess::Public,
-        EntryPointType::Contract,
-    ));
-    entry_points.add_entry_point(EntryPoint::new(
         "claimed_reward",
         vec![
             Parameter::new("addr", Key::cl_type()),
@@ -554,16 +510,6 @@ fn get_entry_points() -> EntryPoints {
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "claimable_reward",
-        vec![
-            Parameter::new("addr", Key::cl_type()),
-            Parameter::new("token", Key::cl_type()),
-        ],
-        U256::cl_type(),
-        EntryPointAccess::Public,
-        EntryPointType::Contract,
-    ));
-    entry_points.add_entry_point(EntryPoint::new(
-        "claimable_reward_write",
         vec![
             Parameter::new("addr", Key::cl_type()),
             Parameter::new("token", Key::cl_type()),
@@ -669,11 +615,30 @@ fn get_entry_points() -> EntryPoints {
         EntryPointType::Contract,
     ));
     entry_points.add_entry_point(EntryPoint::new(
-        "set_rewards",
+        "add_reward",
         vec![
-            Parameter::new("reward_contract", Key::cl_type()),
-            Parameter::new("sigs", String::cl_type()),
-            Parameter::new("reward_tokens", CLType::List(Box::new(String::cl_type()))),
+          Parameter::new("reward_token", Key::cl_type()),
+          Parameter::new("distributor", Key::cl_type()),
+        ],
+        <()>::cl_type(),
+        EntryPointAccess::Public,
+        EntryPointType::Contract,
+    ));
+    entry_points.add_entry_point(EntryPoint::new(
+        "set_reward_distributor",
+        vec![
+          Parameter::new("reward_token", Key::cl_type()),
+          Parameter::new("distributor", Key::cl_type()),
+        ],
+        <()>::cl_type(),
+        EntryPointAccess::Public,
+        EntryPointType::Contract,
+    ));
+    entry_points.add_entry_point(EntryPoint::new(
+        "deposit_reward_token",
+        vec![
+          Parameter::new("reward_token", Key::cl_type()),
+          Parameter::new("amount", U256::cl_type()),
         ],
         <()>::cl_type(),
         EntryPointAccess::Public,
@@ -911,7 +876,7 @@ fn call() {
         let (contract_hash, _) = storage::add_contract_version(
             package_hash,
             get_entry_points(),
-            LiquidityGaugeV3::default()
+            LiquidityGaugeV4::default()
                 .named_keys("".to_string(), "".to_string(), 9, 0.into())
                 .unwrap_or_revert(),
         );
