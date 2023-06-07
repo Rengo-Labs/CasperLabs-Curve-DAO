@@ -278,13 +278,17 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
                     data::RewardIntegral::instance().set(&token, reward_integrals[i]);
                 }
             }
+        }
+
+        if _user != zero_address() {
             let mut receiver: Key = _receiver;
-            if _user != zero_address() && _claim && receiver == zero_address() {
+            if _claim && receiver == zero_address() {
                 receiver = RewardsReceiver::instance().get(&_user);
                 if receiver == zero_address() {
                     receiver = _user;
                 }
             }
+            
             let user_balance: U256 = self.balance_of(Address::from(_user));
             for (i, item) in reward_integrals
                 .iter()
