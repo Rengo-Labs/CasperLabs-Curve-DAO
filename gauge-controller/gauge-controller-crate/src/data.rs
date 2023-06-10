@@ -35,20 +35,21 @@ pub struct GaugeTypeNames {
 }
 
 impl GaugeTypeNames {
+    #[inline(always)]
     pub fn instance() -> GaugeTypeNames {
         GaugeTypeNames {
             dict: Dict::instance(GAUGE_TYPE_NAMES_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(GAUGE_TYPE_NAMES_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &i128) -> String {
         self.dict.get(&owner.to_string()).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &i128, value: String) {
         self.dict.set(&owner.to_string(), value);
     }
@@ -59,20 +60,21 @@ pub struct GaugeTypes_ {
 }
 
 impl GaugeTypes_ {
+    #[inline(always)]
     pub fn instance() -> GaugeTypes_ {
         GaugeTypes_ {
             dict: Dict::instance(GAUGE_TYPES_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(GAUGE_TYPES_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &Key) -> i128 {
         tuple_to_i128(self.dict.get(&key_to_str(owner)).unwrap_or_default())
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &Key, value: i128) {
         self.dict.set(&key_to_str(owner), i128_to_tuple(value));
     }
@@ -237,16 +239,17 @@ pub struct PointsWeight {
 }
 
 impl PointsWeight {
+    #[inline(always)]
     pub fn instance() -> PointsWeight {
         PointsWeight {
             dict: Dict::instance(POINTS_WEIGHT_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(POINTS_WEIGHT_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &Key, recipient: &U256) -> Point {
         Point {
             bias: self
@@ -280,7 +283,7 @@ impl PointsWeight {
                 .unwrap_or_default(),
         }
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &Key, recipient: &U256, value: Point) {
         self.dict.set(
             hash(format!(
@@ -315,21 +318,22 @@ pub struct ChangesWeight {
 }
 
 impl ChangesWeight {
+    #[inline(always)]
     pub fn instance() -> ChangesWeight {
         ChangesWeight {
             dict: Dict::instance(CHANGES_WEIGHT_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(CHANGES_WEIGHT_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &Key, recipient: &U256) -> U256 {
         let key_: String = key_and_value_to_str(owner, recipient);
         self.dict.get(key_.as_str()).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &Key, recipient: &U256, value: U256) {
         let key_: String = key_and_value_to_str(owner, recipient);
         self.dict.set(key_.as_str(), value);
@@ -341,41 +345,44 @@ pub struct TimeWeight {
 }
 
 impl TimeWeight {
+    #[inline(always)]
     pub fn instance() -> TimeWeight {
         TimeWeight {
             dict: Dict::instance(TIME_WEIGHT_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(TIME_WEIGHT_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &Key) -> U256 {
         self.dict.get(&key_to_str(owner)).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &Key, value: U256) {
         self.dict.set(&key_to_str(owner), value);
     }
 }
+
 pub struct Gauges {
     dict: Dict,
     length: U256,
 }
 
 impl Gauges {
+    #[inline(always)]
     pub fn instance() -> Gauges {
         Gauges {
             dict: Dict::instance(GAUGES_DICT),
             length: 0.into(),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(GAUGES_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, indx: &U256) -> Key {
         match self.dict.get(indx.to_string().as_str()) {
             Some(owner) => owner,
@@ -385,11 +392,11 @@ impl Gauges {
             .unwrap(),
         }
     }
-
+    #[inline(always)]
     pub fn set(&self, indx: &U256, value: Key) {
         self.dict.set(indx.to_string().as_str(), value);
     }
-
+    #[inline(always)]
     pub fn push(&mut self, value: Key) {
         self.dict.set(self.length.to_string().as_str(), value);
         self.length = self
@@ -405,25 +412,26 @@ pub struct TimeSum {
 }
 
 impl TimeSum {
+    #[inline(always)]
     pub fn instance() -> TimeSum {
         TimeSum {
             dict: Dict::instance(TIME_SUM_DICT),
             length: 0.into(),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(TIME_SUM_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, indx: &U256) -> U256 {
         self.dict.get(indx.to_string().as_str()).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, indx: &U256, value: U256) {
         self.dict.set(indx.to_string().as_str(), value);
     }
-
+    #[inline(always)]
     pub fn push(&mut self, value: U256) {
         self.dict.set(self.length.to_string().as_str(), value);
         self.length = self
@@ -438,16 +446,19 @@ pub struct PointsSum {
 }
 
 impl PointsSum {
+    #[inline(always)]
     pub fn instance() -> PointsSum {
         PointsSum {
             dict: Dict::instance(POINTS_SUM_DICT),
         }
     }
 
+    #[inline(always)]
     pub fn init() {
         Dict::init(POINTS_SUM_DICT)
     }
 
+    #[inline(always)]
     pub fn get(&self, owner: &i128, recipient: &U256) -> Point {
         Point {
             bias: self
@@ -474,6 +485,7 @@ impl PointsSum {
         }
     }
 
+    #[inline(always)]
     pub fn set(&self, owner: &i128, recipient: &U256, value: Point) {
         self.dict.set(
             hash(format!(
@@ -526,20 +538,21 @@ pub struct PointsTotal {
 }
 
 impl PointsTotal {
+    #[inline(always)]
     pub fn instance() -> PointsTotal {
         PointsTotal {
             dict: Dict::instance(POINTS_TOTAL_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(POINTS_TOTAL_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &U256) -> U256 {
         self.dict.get(&owner.to_string()).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &U256, value: U256) {
         self.dict.set(&owner.to_string(), value);
     }
@@ -550,21 +563,22 @@ pub struct PointsTypeWeight {
 }
 
 impl PointsTypeWeight {
+    #[inline(always)]
     pub fn instance() -> PointsTypeWeight {
         PointsTypeWeight {
             dict: Dict::instance(POINTS_TYPE_WEIGHT_DICT),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(POINTS_TYPE_WEIGHT_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, owner: &i128, recipient: &U256) -> U256 {
         let key_: String = values_to_str(&owner.to_string(), recipient);
         self.dict.get(key_.as_str()).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, owner: &i128, recipient: &U256, value: U256) {
         let key_: String = values_to_str(&owner.to_string(), recipient);
         self.dict.set(key_.as_str(), value);
@@ -577,25 +591,26 @@ pub struct TimeTypeWeight {
 }
 
 impl TimeTypeWeight {
+    #[inline(always)]
     pub fn instance() -> TimeTypeWeight {
         TimeTypeWeight {
             dict: Dict::instance(TIME_TYPE_WEIGHT_DICT),
             length: 0.into(),
         }
     }
-
+    #[inline(always)]
     pub fn init() {
         Dict::init(TIME_TYPE_WEIGHT_DICT)
     }
-
+    #[inline(always)]
     pub fn get(&self, indx: &U256) -> U256 {
         self.dict.get(indx.to_string().as_str()).unwrap_or_default()
     }
-
+    #[inline(always)]
     pub fn set(&self, indx: &U256, value: U256) {
         self.dict.set(indx.to_string().as_str(), value);
     }
-
+    #[inline(always)]
     pub fn push(&mut self, value: U256) {
         self.dict.set(self.length.to_string().as_str(), value);
         self.length = self

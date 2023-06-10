@@ -344,7 +344,7 @@ fn n_gauges() {
 /// @notice Add gauge type with name `_name` and weight `weight`
 /// @param _name Name of gauge type
 /// @param weight Weight of gauge type
-
+#[inline(always)]
 #[no_mangle]
 fn add_type() {
     let name: String = runtime::get_named_arg("name");
@@ -356,6 +356,7 @@ fn add_type() {
 /// @param addr Gauge address
 /// @param gauge_type Gauge type
 /// @param weight Gauge weight
+#[inline(always)]
 #[no_mangle]
 fn add_gauge() {
     let addr: Key = runtime::get_named_arg("addr");
