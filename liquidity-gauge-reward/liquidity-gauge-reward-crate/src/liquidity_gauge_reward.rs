@@ -222,7 +222,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
         let mut dI: U256 = 0.into();
         if total_balance > 0.into() {
             dI = U256::from(10)
-                .pow(18.into())
+                .pow(9.into())
                 .checked_mul(d_reward)
                 .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError15)
                 .checked_div(total_balance)
@@ -247,7 +247,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
                         .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError19)
                         .checked_div(10.into())
                         .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError20)
-                        .pow(18.into()),
+                        .pow(9.into()),
                 )
                 .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError21),
         );
@@ -436,7 +436,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
                         .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError45)
                         .checked_div(10.into())
                         .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError46)
-                        .pow(18.into()),
+                        .pow(9.into()),
                 )
                 .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError47),
         );
@@ -500,7 +500,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
         let mut dI: U256 = 0.into();
         if total_balance > 0.into() {
             dI = U256::from(10)
-                .pow(18.into())
+                .pow(9.into())
                 .checked_mul(d_reward)
                 .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError49)
                 .checked_div(total_balance)
@@ -522,7 +522,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
             .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError54)
             .checked_div(10.into())
             .unwrap_or_revert_with(Error::LiquidityGaugeRewardArithmaticError55)
-            .pow(18.into())
+            .pow(9.into())
     }
 
     /// @notice Kick `addr` for abusing their boost
