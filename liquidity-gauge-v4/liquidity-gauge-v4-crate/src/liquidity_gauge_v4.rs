@@ -445,7 +445,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                         .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError41),
                 )
                 .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError42)
-                .checked_div(U256::from(10).pow(18.into()))
+                .checked_div(U256::from(10).pow(9.into()))
                 .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError43),
         );
         data::IntegrateInvSupplyOf::instance().set(&addr, integrate_inv_supply);
