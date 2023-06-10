@@ -34,16 +34,19 @@ pub trait OWNABLE<Storage: ContractStorage>: ContractContext<Storage> {
         });
     }
     /// @dev Returns the address of the current owner.
+    #[inline(always)]
     fn owner(&self) -> Key {
         data::get_owner()
     }
     /// @dev Throws if called by any account other than the owner.
+    #[inline(always)]
     fn only_owner(&self) {
         if !(self.is_owner()) {
             runtime::revert(ApiError::from(Error::OwnableNotOwner));
         }
     }
     /// @dev Returns true if the caller is the current owner.
+    #[inline(always)]
     fn is_owner(&self) -> bool {
         self.get_caller() == data::get_owner()
     }
@@ -52,6 +55,7 @@ pub trait OWNABLE<Storage: ContractStorage>: ContractContext<Storage> {
     /// *
     /// * NOTE: Renouncing ownership will leave the contract without an owner,
     /// * thereby removing any functionality that is only available to the owner.
+    #[inline(always)]
     fn renounce_ownership(&mut self) {
         self.only_owner();
         self.ownable_emit(&OwnableEvent::OwnershipTransferred {
@@ -62,10 +66,12 @@ pub trait OWNABLE<Storage: ContractStorage>: ContractContext<Storage> {
     }
     /// * @dev Transfers ownership of the contract to a new account (`newOwner`).
     /// * Can only be called by the current owner.
+    #[inline(always)]
     fn transfer_ownership(&mut self, new_owner: Key) {
         self.only_owner();
         self._transfer_ownership(new_owner);
     }
+    #[inline(always)]
     fn _transfer_ownership(&mut self, new_owner: Key) {
         if new_owner == data::zero_address() {
             runtime::revert(ApiError::from(Error::OwnableNewOwnerAddressZero));

@@ -29,10 +29,12 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
         UserRewardPerTokenPaid::init();
         Rewards::init();
     }
+    #[inline(always)]
     fn last_time_reward_applicable(&self) -> U256 {
         let blocktime: u64 = runtime::get_blocktime().into();
         U256::min(U256::from(blocktime), get_period_finish())
     }
+    #[inline(always)]
     fn reward_per_token(&self) -> U256 {
         if self.total_supply() == 0.into() {
             return get_reward_per_token_stored();
@@ -51,6 +53,7 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
             )
             .unwrap_or_revert_with(Error::CurveRewardsAdditionError1)
     }
+    #[inline(always)]
     fn earned(&self, account: Key) -> U256 {
         self.balance_of(Address::from(account))
             .checked_mul(
@@ -64,6 +67,7 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
             .checked_add(Rewards::instance().get(&account))
             .unwrap_or_revert_with(Error::CurveRewardsAdditionError2)
     }
+    #[inline(always)]
     fn stake(&mut self, amount: U256) {
         self.update_reward(self.get_caller());
         if amount <= 0.into() {
@@ -78,6 +82,7 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
             },
         );
     }
+    #[inline(always)]
     fn withdraw(&mut self, amount: U256) {
         self.update_reward(self.get_caller());
         if amount <= 0.into() {
@@ -92,6 +97,7 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
             },
         );
     }
+    #[inline(always)]
     fn get_reward(&mut self) {
         self.update_reward(self.get_caller());
         let reward: U256 = self.earned(self.get_caller());
@@ -116,10 +122,12 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
             );
         }
     }
+    #[inline(always)]
     fn exit(&mut self) {
         CURVEREWARDS::withdraw(self, self.balance_of(Address::from(self.get_caller())));
         self.get_reward();
     }
+    #[inline(always)]
     fn notify_reward_amount(&mut self, reward: U256) {
         IREWARDDISTRIBUTIONRECIPIENT::only_reward_distribution(self);
         self.update_reward(zero_address());
@@ -154,6 +162,7 @@ pub trait CURVEREWARDS<Storage: ContractStorage>:
         CURVEREWARDS::emit(self, &CurveRewardsEvent::RewardAdded { reward });
     }
 
+    #[inline(always)]
     fn update_reward(&self, account: Key) {
         set_reward_per_token_stored(self.reward_per_token());
         set_last_update_time(self.last_time_reward_applicable());

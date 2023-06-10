@@ -46,6 +46,7 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
         AllowedToMintFor::init();
     }
 
+    #[inline(always)]
     fn _mint_for(&mut self, gauge_addr: Key, _for: Key) {
         let controller: Key = self.controller();
         let controller_hash_add_array = match controller {
@@ -106,6 +107,7 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
             });
         }
     }
+    #[inline(always)]
     fn mint(&mut self, gauge_addr: Key) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -116,6 +118,7 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
         self._mint_for(gauge_addr, self.get_caller());
         data::set_lock(0);
     }
+    #[inline(always)]
     fn mint_many(&mut self, gauge_addrs: Vec<Key>) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -131,6 +134,7 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
         }
         data::set_lock(0);
     }
+    #[inline(always)]
     fn mint_for(&mut self, gauge_addr: Key, _for: Key) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -145,21 +149,26 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
         data::set_lock(0);
     }
 
+    #[inline(always)]
     fn toggle_approve_mint(&mut self, minting_user: Key) {
         let is_allowed = self.allowed_to_mint_for(minting_user, self.get_caller());
         AllowedToMintFor::instance().set(&minting_user, &self.get_caller(), !is_allowed);
     }
 
+    #[inline(always)]
     fn allowed_to_mint_for(&mut self, owner: Key, spender: Key) -> bool {
         AllowedToMintFor::instance().get(&owner, &spender)
     }
+    #[inline(always)]
     fn minted(&mut self, owner: Key, spender: Key) -> U256 {
         Minted::instance().get(&owner, &spender)
     }
 
+    #[inline(always)]
     fn token(&mut self) -> Key {
         data::token()
     }
+    #[inline(always)]
     fn controller(&mut self) -> Key {
         data::controller()
     }
@@ -182,6 +191,7 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
         };
     }
 
+    #[inline(always)]
     fn get_package_hash(&mut self) -> ContractPackageHash {
         data::get_package_hash()
     }

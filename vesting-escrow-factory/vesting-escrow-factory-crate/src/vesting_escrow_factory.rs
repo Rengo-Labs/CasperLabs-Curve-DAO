@@ -39,6 +39,7 @@ pub trait VESTINGESCROWFACTORY<Storage: ContractStorage>: ContractContext<Storag
         data::set_package_hash(package_hash);
     }
 
+    #[inline(always)]
     fn deploy_vesting_contract(
         &mut self,
         _token: Key,
@@ -110,6 +111,7 @@ pub trait VESTINGESCROWFACTORY<Storage: ContractStorage>: ContractContext<Storag
         }
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&mut self, addr: Key) -> bool {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Factroy Only Admin
@@ -120,6 +122,7 @@ pub trait VESTINGESCROWFACTORY<Storage: ContractStorage>: ContractContext<Storag
         true
     }
 
+    #[inline(always)]
     fn apply_transfer_ownership(&mut self) -> bool {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -135,18 +138,22 @@ pub trait VESTINGESCROWFACTORY<Storage: ContractStorage>: ContractContext<Storag
         true
     }
 
+    #[inline(always)]
     fn admin(&mut self) -> Key {
         data::admin()
     }
 
+    #[inline(always)]
     fn future_admin(&mut self) -> Key {
         data::future_admin()
     }
 
+    #[inline(always)]
     fn target(&mut self) -> Key {
         data::target()
     }
 
+    #[inline(always)]
     fn vesting_escrow_simple_contract(&mut self) -> Key {
         data::vesting_escrow_simple_contract()
     }
@@ -170,6 +177,7 @@ pub trait VESTINGESCROWFACTORY<Storage: ContractStorage>: ContractContext<Storag
         };
     }
 
+    #[inline(always)]
     fn get_package_hash(&mut self) -> ContractPackageHash {
         data::get_package_hash()
     }

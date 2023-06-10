@@ -146,6 +146,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
         TimeTypeWeight::init();
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&mut self, addr: Key) {
         if self.get_caller() != self.admin() {
             //Gauge Controller Only Admin
@@ -154,6 +155,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
         data::set_future_admin(addr);
         self.emit(&GAUGECONLTROLLEREvent::CommitOwnership { admin: addr });
     }
+    #[inline(always)]
     fn apply_transfer_ownership(&mut self) {
         if self.get_caller() != self.admin() {
             //Gauge Controller Only Admin
@@ -168,6 +170,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
         self.emit(&GAUGECONLTROLLEREvent::ApplyOwnership { admin: _admin });
     }
 
+    #[inline(always)]
     fn gauge_types(&mut self, _addr: Key) -> i128 {
         let gauge_type = self.gauge_types_(_addr);
         if gauge_type == 0 {
@@ -179,10 +182,12 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
             .unwrap_or_revert_with(Error::GaugeControllerUnderFlow1)
     }
 
+    #[inline(always)]
     fn checkpoint(&mut self) {
         self._get_total();
     }
 
+    #[inline(always)]
     fn checkpoint_gauge(&mut self, addr: Key) {
         self._get_weight(addr);
         self._get_total();
@@ -193,6 +198,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param gauge_addr Address of the gauge
     /// @return Gauge weight
 
+    #[inline(always)]
     fn _get_weight(&mut self, gauge_addr: Key) -> U256 {
         let mut t: U256 = self.time_weight(gauge_addr);
         if t > U256::from(0) {
@@ -361,6 +367,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param time Relative weight at the specified timestamp in the past or present
     /// @return Value of relative weight normalized to 1e9
 
+    #[inline(always)]
     fn _gauge_relative_weight(&mut self, addr: Key, time: U256) -> U256 {
         let t: U256 = time
             .checked_div(WEEK)
@@ -713,6 +720,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
         });
     }
 
+    #[inline(always)]
     fn vote_for_gauge_weights(&mut self, _gauge_addr: Key, _user_weight: U256) {
         let escrow: Key = data::voting_escrow();
 
@@ -1039,24 +1047,31 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
         }
     }
 
+    #[inline(always)]
     fn time_total(&mut self) -> U256 {
         data::time_total()
     }
+    #[inline(always)]
     fn token(&mut self) -> Key {
         data::token()
     }
+    #[inline(always)]
     fn admin(&mut self) -> Key {
         data::admin()
     }
+    #[inline(always)]
     fn future_admin(&mut self) -> Key {
         data::future_admin()
     }
+    #[inline(always)]
     fn voting_escrow(&mut self) -> Key {
         data::voting_escrow()
     }
+    #[inline(always)]
     fn n_gauge_types(&mut self) -> i128 {
         data::n_gauge_types()
     }
+    #[inline(always)]
     fn n_gauges(&mut self) -> i128 {
         data::n_gauges()
     }
@@ -1160,6 +1175,7 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
         };
     }
 
+    #[inline(always)]
     fn get_package_hash(&mut self) -> ContractPackageHash {
         data::get_package_hash()
     }

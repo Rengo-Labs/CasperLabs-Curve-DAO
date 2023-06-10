@@ -77,19 +77,24 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         }
     }
 
+    #[inline(always)]
     fn initial_locked(&mut self, owner: Key) -> U256 {
         InitialLocked::instance().get(&owner)
     }
+    #[inline(always)]
     fn total_claimed(&mut self, owner: Key) -> U256 {
         TotalClaimed::instance().get(&owner)
     }
+    #[inline(always)]
     fn disabled_at(&mut self, owner: Key) -> U256 {
         DisabledAt::instance().get(&owner)
     }
+    #[inline(always)]
     fn fund_admins(&mut self, owner: Key) -> bool {
         FundAdmins::instance().get(&owner)
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&mut self, addr: Key) -> bool {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -100,6 +105,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         true
     }
 
+    #[inline(always)]
     fn apply_transfer_ownership(&mut self) -> bool {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -114,6 +120,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         self.emit(&VESTINGESCROWEvent::ApplyOwnership { admin: _admin });
         true
     }
+    #[inline(always)]
     fn disable_fund_admins(&mut self) {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -121,6 +128,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         }
         data::set_fund_admins_enabled(false);
     }
+    #[inline(always)]
     fn disable_can_disable(&mut self) {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -128,6 +136,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         }
         data::set_can_disable(false);
     }
+    #[inline(always)]
     fn toggle_disable(&mut self, _recipient: Key) {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -149,36 +158,46 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         });
     }
 
+    #[inline(always)]
     fn admin(&mut self) -> Key {
         data::admin()
     }
 
+    #[inline(always)]
     fn future_admin(&mut self) -> Key {
         data::future_admin()
     }
 
+    #[inline(always)]
     fn can_disable(&mut self) -> bool {
         data::can_disable()
     }
+    #[inline(always)]
     fn fund_admins_enabled(&mut self) -> bool {
         data::fund_admins_enabled()
     }
+    #[inline(always)]
     fn unallocated_supply(&mut self) -> U256 {
         data::unallocated_supply()
     }
+    #[inline(always)]
     fn initial_locked_supply(&mut self) -> U256 {
         data::initial_locked_supply()
     }
+    #[inline(always)]
     fn end_time(&mut self) -> U256 {
         data::end_time()
     }
+    #[inline(always)]
     fn start_time(&mut self) -> U256 {
         data::start_time()
     }
+    #[inline(always)]
     fn token(&mut self) -> Key {
         data::token()
     }
 
+    #[inline(always)]
     fn _total_vested_of(&mut self, _recipient: Key, _time: Option<U256>) -> U256 {
         let time: U256 = if let Some(..) = _time {
             _time.unwrap()
@@ -212,6 +231,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
             locked
         }
     }
+    #[inline(always)]
     fn _total_vested(&mut self) -> U256 {
         let start: U256 = self.start_time();
         let end: U256 = self.end_time();
@@ -239,28 +259,34 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
             locked
         }
     }
+    #[inline(always)]
     fn vested_supply(&mut self) -> U256 {
         self._total_vested()
     }
+    #[inline(always)]
     fn locked_supply(&mut self) -> U256 {
         self.initial_locked_supply()
             .checked_sub(self._total_vested())
             .unwrap_or_revert_with(Error::VestingEscrowUnderFlow9)
     }
+    #[inline(always)]
     fn vested_of(&mut self, _recipient: Key) -> U256 {
         self._total_vested_of(_recipient, None)
     }
 
+    #[inline(always)]
     fn balance_of(&mut self, _recipient: Key) -> U256 {
         self._total_vested_of(_recipient, None)
             .checked_sub(self.total_claimed(_recipient))
             .unwrap_or_revert_with(Error::VestingEscrowUnderFlow10)
     }
+    #[inline(always)]
     fn locked_of(&mut self, _recipient: Key) -> U256 {
         self.initial_locked(_recipient)
             .checked_sub(self._total_vested_of(_recipient, None))
             .unwrap_or_revert_with(Error::VestingEscrowUnderFlow11)
     }
+    #[inline(always)]
     fn add_tokens(&mut self, _amount: U256) {
         if self.get_caller() != self.admin() {
             //Vesting Escrow Only Admin
@@ -285,6 +311,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         data::set_unallocated_supply(res);
     }
 
+    #[inline(always)]
     fn fund(&mut self, _recipients: Vec<String>, _amounts: Vec<U256>) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -338,6 +365,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         );
         data::set_lock(0);
     }
+    #[inline(always)]
     fn claim(&mut self, _addr: Option<Key>) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -416,6 +444,7 @@ pub trait VESTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         };
     }
 
+    #[inline(always)]
     fn get_package_hash(&mut self) -> ContractPackageHash {
         data::get_package_hash()
     }

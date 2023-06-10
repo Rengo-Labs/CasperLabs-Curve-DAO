@@ -115,19 +115,24 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         ClaimData::init();
     }
 
+    #[inline(always)]
     fn reward_balances(&mut self, owner: Key) -> U256 {
         RewardBalances::instance().get(&owner)
     }
+    #[inline(always)]
     fn rewards_receiver(&mut self, claimant: Key) -> Key {
         RewardsReceiver::instance().get(&claimant)
     }
+    #[inline(always)]
     fn reward_integral(&mut self, reward_token: Key) -> U256 {
         RewardIntegral::instance().get(&reward_token)
     }
+    #[inline(always)]
     fn reward_tokens(&mut self, index: U256) -> Key {
         RewardTokens::instance().get(&index)
     }
 
+    #[inline(always)]
     fn transfer(&mut self, _to: Address, _value: U256) -> Result<(), Erc20Error> {
         let lock = data::get_lock();
         if lock != 0 {
@@ -140,17 +145,21 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         Ok(())
     }
 
+    #[inline(always)]
     fn approve(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         CURVEERC20::approve(self, spender, amount)
     }
 
+    #[inline(always)]
     fn reward_integral_for(&mut self, reward_token: Key, claiming_address: Key) -> U256 {
         RewardIntegralFor::instance().get(&reward_token, &claiming_address)
     }
 
+    #[inline(always)]
     fn claim_data(&mut self, user: Key, claiming_address: Key) -> ClaimDataStruct {
         ClaimData::instance().get(&user, &claiming_address)
     }
+    #[inline(always)]
     fn increase_allowance(&mut self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         let res = CURVEERC20::increase_allowance(self, spender, amount);
         self.emit(&REWARDONLYGAUGEEvent::Approval {
@@ -160,6 +169,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         });
         res
     }
+    #[inline(always)]
     fn decrease_allowance(&mut self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         let res = CURVEERC20::decrease_allowance(self, spender, amount);
         self.emit(&REWARDONLYGAUGEEvent::Approval {
@@ -170,6 +180,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         res
     }
 
+    #[inline(always)]
     fn transfer_from(&mut self, _from: Address, _to: Address, _value: U256) -> Result<(), u32> {
         let lock = data::get_lock();
         if lock != 0 {
@@ -189,6 +200,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         Ok(())
     }
 
+    #[inline(always)]
     fn _transfer(&mut self, _from: Key, _to: Key, _value: U256) {
         let reward_data: RewardData = self.reward_data();
         let _reward_contract = reward_data.address;
@@ -214,13 +226,16 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         });
     }
 
+    #[inline(always)]
     fn reward_data(&mut self) -> RewardData {
         data::reward_data()
     }
+    #[inline(always)]
     fn claim_sig(&mut self) -> String {
         data::claim_sig()
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&mut self, addr: Key) {
         if self.get_caller() != self.admin() {
             //Reward Only Gauge Only Admin
@@ -230,6 +245,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         self.emit(&REWARDONLYGAUGEEvent::CommitOwnership { admin: addr });
     }
 
+    #[inline(always)]
     fn accept_transfer_ownership(&mut self) {
         let _admin = self.future_admin();
         if self.get_caller() != _admin {
@@ -240,20 +256,25 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         self.emit(&REWARDONLYGAUGEEvent::ApplyOwnership { admin: _admin });
     }
 
+    #[inline(always)]
     fn reward_contract(&mut self) -> Key {
         self.reward_data().address
     }
+    #[inline(always)]
     fn last_claim(&mut self) -> U256 {
         self.reward_data().time_stamp
     }
+    #[inline(always)]
     fn claimed_reward(&mut self, _addr: Key, _token: Key) -> U256 {
         self.claim_data(_addr, _token).claimed_amount
     }
+    #[inline(always)]
     fn claimable_reward(&mut self, _addr: Key, _token: Key) -> U256 {
         self.claim_data(_addr, _token).claimable_amount
     }
 
     // lock
+    #[inline(always)]
     fn claimable_reward_write(&mut self, _addr: Key, _token: Key) -> U256 {
         let lock = data::get_lock();
         if lock != 0 {
@@ -271,6 +292,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
     }
 
     // lock
+    #[inline(always)]
     fn claim_rewards(&mut self, _addr: Option<Key>, _receiver: Option<Key>) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -300,6 +322,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
     }
 
     //lock
+    #[inline(always)]
     fn withdraw(&mut self, _value: U256, _claim_rewards: Option<bool>) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -345,6 +368,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         });
         data::set_lock(0);
     }
+    #[inline(always)]
     fn deposit(&mut self, _value: U256, _addr: Option<Key>, _claim_rewards: Option<bool>) {
         let lock = data::get_lock();
         if lock != 0 {
@@ -394,6 +418,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         });
         data::set_lock(0);
     }
+    #[inline(always)]
     fn set_rewards(
         &mut self,
         _reward_contract: Key,
@@ -464,23 +489,28 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
         data::set_lock(0);
     }
 
+    #[inline(always)]
     fn set_rewards_receiver(&mut self, _receiver: Key) {
         RewardsReceiver::instance().set(&self.get_caller(), _receiver)
     }
 
+    #[inline(always)]
     fn lp_token(&mut self) -> Key {
         data::lp_token()
     }
+    #[inline(always)]
     fn admin(&mut self) -> Key {
         data::admin()
     }
 
+    #[inline(always)]
     fn future_admin(&mut self) -> Key {
         data::future_admin()
     }
 
     /// @notice Claim pending rewards and checkpoint rewards for a user
 
+    #[inline(always)]
     fn _checkpoint_rewards(
         &mut self,
         _user: Key,
@@ -611,6 +641,7 @@ pub trait REWARDONLYGAUGE<Storage: ContractStorage>:
             }
         }
     }
+    #[inline(always)]
     fn named_keys(&self) -> Result<BTreeMap<String, Key>, Erc20Error> {
         CURVEERC20::named_keys(self, "".to_string(), "".to_string(), 9, 0.into())
     }

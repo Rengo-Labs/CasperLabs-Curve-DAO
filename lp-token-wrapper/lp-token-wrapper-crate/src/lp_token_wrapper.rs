@@ -13,6 +13,7 @@ pub trait LPTOKENWRAPPER<Storage: ContractStorage>:
         CURVEERC20::init(self, contract_hash, package_hash);
         set_uni(uni);
     }
+    #[inline(always)]
     fn stake(&mut self, amount: U256) {
         self.mint(Address::from(self.get_caller()), amount)
             .unwrap_or_revert();
@@ -27,6 +28,7 @@ pub trait LPTOKENWRAPPER<Storage: ContractStorage>:
             },
         );
     }
+    #[inline(always)]
     fn withdraw(&mut self, amount: U256) {
         self.burn(Address::from(self.get_caller()), amount)
             .unwrap_or_revert();
