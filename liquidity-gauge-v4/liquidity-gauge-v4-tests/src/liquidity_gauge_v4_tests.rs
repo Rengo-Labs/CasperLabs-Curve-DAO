@@ -96,7 +96,15 @@ fn deploy_minter(env: &TestEnv, sender: AccountHash, controller: Key, token: Key
 }
 // Liquidity Guage V4
 
-fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
+fn deploy() -> (
+    TestEnv,
+    AccountHash,
+    TestContract,
+    u64,
+    TestContract,
+    TestContract,
+    TestContract,
+) {
     let env = TestEnv::new();
     let owner = env.next_user();
     let time_now: u64 = LIQUIDITYGUAGEV4INSTANCEInstance::now();
@@ -131,6 +139,14 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         Key::Hash(minter.package_hash()),
         Key::Account(owner),
     );
+
+    erc20_crv.call_contract(
+        owner,
+        "set_minter",
+        runtime_args! {"minter"=>Key::Hash(minter.package_hash())},
+        time_now,
+    );
+
     // For Minting Purpose
     let to = Key::Hash(liquidity_gauge_v4_instance.package_hash());
     let amount: U256 = U256::from(TEN_E_NINE * 100000000000000000000);
@@ -150,7 +166,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
     gauge_controller.call_contract(
         owner,
         "add_type",
-        runtime_args! {"name" => _name, "weight" => None::<U256> },
+        runtime_args! {"name" => _name, "weight" => Some(U256::from(1)) },
         time_now,
     );
     let addr: Key = Key::Account(owner);
@@ -161,7 +177,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         runtime_args! {
             "addr" => addr,
             "gauge_type" => gauge_type,
-            "weight"=>None::<U256>
+            "weight"=>Some(U256::from(10))
         },
         time_now,
     );
@@ -169,7 +185,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
     gauge_controller.call_contract(
         owner,
         "add_type",
-        runtime_args! {"name" => _name_1, "weight" => None::<U256> },
+        runtime_args! {"name" => _name_1, "weight" => Some(U256::from(100)) },
         time_now,
     );
     let addr1: Key = Key::Hash(liquidity_gauge_v4_instance.package_hash());
@@ -180,17 +196,25 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         runtime_args! {
             "addr" => addr1,
             "gauge_type" => gauge_type_1,
-            "weight"=>None::<U256>
+            "weight"=>Some(U256::from(1000))
         },
         time_now,
     );
-    (env, owner, liquidity_gauge_v4_instance, time_now)
+    (
+        env,
+        owner,
+        liquidity_gauge_v4_instance,
+        time_now,
+        erc20,
+        erc20_crv,
+        minter,
+    )
 }
 mod t1 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_deploy() {
-        let (_, _, contract, _) = deploy();
+        let (_, _, contract, _, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         assert_eq!(contract.name(), "Curve.fi LPtokGauge Deposit".to_string());
         assert_eq!(contract.symbol(), "LPtok-gauge".to_string());
@@ -199,7 +223,7 @@ mod t1 {
     }
     #[test]
     fn test_commit_transfer_ownership() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let addr = Key::from(env.next_user());
         contract.commit_transfer_ownership(owner, addr, time_now);
@@ -211,7 +235,7 @@ mod t2 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_increase_allowance() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let spender = env.next_user();
         let amount: U256 = 50000000.into();
@@ -223,7 +247,7 @@ mod t2 {
     }
     #[test]
     fn test_decrease_allowance() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let spender = env.next_user();
         let approve_amount: U256 = 500000.into();
@@ -241,7 +265,7 @@ mod t2 {
     }
     #[test]
     fn test_approve() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let spender = env.next_user();
         let approve_amount: U256 = 500000.into();
@@ -253,7 +277,7 @@ mod t2 {
     }
     #[test]
     fn test_decimals() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
 
         TestContract::new(
             &env,
@@ -276,7 +300,7 @@ mod t3 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_integrate_checkpoint() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
 
         TestContract::new(
             &env,
@@ -294,7 +318,7 @@ mod t3 {
     }
     #[test]
     fn test_claimed_reward() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let addr = env.next_user();
         let token = env.next_user();
         TestContract::new(
@@ -319,7 +343,7 @@ mod t6 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_deposit() {
-        let (_, owner, contract, time_now) = deploy();
+        let (_, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let value: U256 = U256::from(1000 * TEN_E_NINE);
         contract.deposit(owner, value, None, None, time_now);
@@ -329,7 +353,7 @@ mod t7 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_withdraw() {
-        let (_, owner, contract, time_now) = deploy();
+        let (_, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let value: U256 = 1000.into();
         contract.deposit(owner, value, None, None, time_now);
@@ -340,7 +364,7 @@ mod t8 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_transfer() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let value: U256 = 1000000.into();
         let amount: U256 = 100000.into();
@@ -353,7 +377,7 @@ mod t9 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_transfer_from() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let spender = env.next_user();
         let amount: U256 = 100000.into();
@@ -373,7 +397,7 @@ mod t10 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_claimable_tokens() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let addr = env.next_user();
         TestContract::new(
@@ -397,7 +421,7 @@ mod t4 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_claimable_reward() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let addr = env.next_user();
         let token = env.next_user();
@@ -422,7 +446,7 @@ mod t11 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_user_checkpoint() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         TestContract::new(
             &env,
@@ -445,14 +469,14 @@ mod t5 {
     use crate::liquidity_gauge_v4_tests::*;
     #[test]
     fn test_set_rewards_receiver() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let receiver: Key = Key::from(env.next_user());
         contract.set_rewards_receiver(owner, receiver, time_now);
     }
     #[test]
     fn test_claim_rewards() {
-        let (_env, owner, contract, time_now) = deploy();
+        let (_env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         contract.claim_rewards(owner, None, None, time_now)
     }
@@ -462,7 +486,7 @@ mod t12 {
 
     #[test]
     fn test_accept_transfer_ownership() {
-        let (env, owner, contract, time_now) = deploy();
+        let (env, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let addr = env.next_user();
         contract.commit_transfer_ownership(owner, Key::from(addr), time_now);
@@ -473,10 +497,28 @@ mod t12 {
     }
     #[test]
     fn test_set_killed() {
-        let (_, owner, contract, time_now) = deploy();
+        let (_, owner, contract, time_now, _, _, _) = deploy();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
         let is_killed: bool = true;
         contract.set_killed(owner, is_killed, time_now);
         assert_eq!(contract.is_killed(), is_killed);
+    }
+}
+mod t13 {
+    use crate::{liquidity_gauge_v4_instance::address_to_str, liquidity_gauge_v4_tests::*};
+    #[test]
+    fn test_crv_claim() {
+        let (_, owner, contract, time_now, erc20, erc20_crv, minter) = deploy();
+        let value: U256 = 100000000000u64.into();
+        let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
+        contract.deposit(owner, value, None, None, time_now);
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            time_now + 604800000,
+        );
+        let bal: U256 = erc20_crv.query(BALANCES, address_to_str(&Address::Account(owner)));
+        assert!(bal > 0.into(), "CRV Balance not minted");
     }
 }

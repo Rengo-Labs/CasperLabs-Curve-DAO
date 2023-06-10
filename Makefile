@@ -172,11 +172,12 @@ test-only-liquidity-gauge-v4:
 	cargo test -p liquidity-gauge-v4-tests t5 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t6 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t7 -- --test-threads=1
+	cargo test -p liquidity-gauge-v4-tests t8 -- --test-threads=1
+	cargo test -p liquidity-gauge-v4-tests t9 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t10 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t11 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t12 -- --test-threads=1
-	cargo test -p liquidity-gauge-v4-tests t8 -- --test-threads=1
-	cargo test -p liquidity-gauge-v4-tests t9 -- --test-threads=1
+	cargo test -p liquidity-gauge-v4-tests t13 -- --test-threads=1
 
 test-only-i-reward-distribution-recipient:
 	cargo test -p i-reward-distribution-recipient-tests

@@ -167,7 +167,7 @@ fn stake() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         block_time,
     );
@@ -191,7 +191,7 @@ fn withdraw() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         block_time,
     );
@@ -223,7 +223,7 @@ fn get_reward() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         block_time,
     );
@@ -246,7 +246,7 @@ fn exit() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         block_time,
     );
@@ -268,7 +268,7 @@ fn exit_panic() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         block_time,
     );
@@ -304,7 +304,7 @@ fn notify_reward_amount() {
         runtime_args! {
             "entrypoint" => String::from(BALANCE_OF),
             "package_hash" => package_hash,
-            "owner" => Key::Account(owner)
+            "address" => Key::Account(owner)
         },
         block_time,
     );
