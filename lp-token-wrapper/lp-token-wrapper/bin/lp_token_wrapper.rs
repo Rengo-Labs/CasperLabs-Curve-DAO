@@ -56,8 +56,8 @@ fn total_supply() {
 /// * `owner` - Address that holds the account address of the user
 #[no_mangle]
 fn balance_of() {
-    let owner: Address = runtime::get_named_arg("owner");
-    let ret: U256 = LpTokenWrapper::default().balance_of(owner);
+    let address: Address = runtime::get_named_arg("address");
+    let ret: U256 = LpTokenWrapper::default().balance_of(address);
     runtime::ret(CLValue::from_t(ret).unwrap_or_revert());
 }
 
@@ -108,7 +108,7 @@ fn get_entry_points() -> EntryPoints {
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "balance_of",
-        vec![Parameter::new("owner", Address::cl_type())],
+        vec![Parameter::new("address", Address::cl_type())],
         U256::cl_type(),
         EntryPointAccess::Public,
         EntryPointType::Contract,

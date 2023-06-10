@@ -17,6 +17,7 @@ pub type TokenId = U256;
 pub type Meta = BTreeMap<String, String>;
 
 pub const ALLOWANCES: &str = "allowances";
+use common::keys::BALANCES;
 use crv20::Address;
 use hex::encode;
 
@@ -262,7 +263,9 @@ impl LIQUIDITYGUAGEV4INSTANCEInstance {
             time_now,
         );
     }
-
+    pub fn balance_of(&self, owner: Address) -> U256 {
+        self.0.query(BALANCES, address_to_str(&owner))
+    }
     //var
     pub fn future_admin(&self) -> Key {
         self.0.query_named_key(String::from("future_admin"))
@@ -309,10 +312,12 @@ impl LIQUIDITYGUAGEV4INSTANCEInstance {
         hasher.finalize_variable(|hash| ret.clone_from_slice(hash));
         hex::encode(ret)
     }
+    pub fn integrate_fraction(&self, key: &Address) -> U256 {
+        self.0.query_dictionary("integrate_fraction", address_to_str(key)).unwrap_or_default()
+    }
     pub fn package_hash(&self) -> [u8; 32] {
         self.0.package_hash()
     }
-
     // Get stored key values
     pub fn key_value<T: CLTyped + FromBytes>(&self, key: String) -> T {
         self.0.query_named_key(key)

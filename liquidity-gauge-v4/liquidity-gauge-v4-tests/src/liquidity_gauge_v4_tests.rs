@@ -96,7 +96,7 @@ fn deploy_minter(env: &TestEnv, sender: AccountHash, controller: Key, token: Key
 }
 // Liquidity Guage V4
 
-fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
+fn deploy() -> (TestEnv, AccountHash, TestContract, u64/*, TestContract, TestContract, AccountHash, TestContract*/) {
     let env = TestEnv::new();
     let owner = env.next_user();
     let time_now: u64 = LIQUIDITYGUAGEV4INSTANCEInstance::now();
@@ -131,17 +131,23 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         Key::Hash(minter.package_hash()),
         Key::Account(owner),
     );
+
+    erc20_crv.call_contract(owner, "set_minter", runtime_args! {"minter"=>Key::Hash(minter.package_hash())}, time_now);
+
     // For Minting Purpose
+    let user = env.next_user();
     let to = Key::Hash(liquidity_gauge_v4_instance.package_hash());
     let amount: U256 = U256::from(TEN_E_NINE * 100000000000000000000);
     erc20.call_contract(
-        owner,
+        // owner,
+        user,
         "mint",
         runtime_args! {"to" => to , "amount" => amount},
         time_now,
     );
     erc20.call_contract(
-        owner,
+        // owner,
+        user,
         "approve",
         runtime_args! {"spender" =>Address::Contract(liquidity_gauge_v4_instance.package_hash().into()) , "amount" => amount},
         time_now,
@@ -150,10 +156,11 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
     gauge_controller.call_contract(
         owner,
         "add_type",
-        runtime_args! {"name" => _name, "weight" => None::<U256> },
+        runtime_args! {"name" => _name, "weight" => Some(U256::from(1)) },
         time_now,
     );
-    let addr: Key = Key::Account(owner);
+    // let addr: Key = Key::Account(owner);
+    let addr: Key = Key::Account(user);
     let gauge_type: (bool, U128) = (false, 0.into());
     gauge_controller.call_contract(
         owner,
@@ -161,7 +168,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         runtime_args! {
             "addr" => addr,
             "gauge_type" => gauge_type,
-            "weight"=>None::<U256>
+            "weight"=>Some(U256::from(10))
         },
         time_now,
     );
@@ -169,7 +176,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
     gauge_controller.call_contract(
         owner,
         "add_type",
-        runtime_args! {"name" => _name_1, "weight" => None::<U256> },
+        runtime_args! {"name" => _name_1, "weight" => Some(U256::from(100)) },
         time_now,
     );
     let addr1: Key = Key::Hash(liquidity_gauge_v4_instance.package_hash());
@@ -180,11 +187,11 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         runtime_args! {
             "addr" => addr1,
             "gauge_type" => gauge_type_1,
-            "weight"=>None::<U256>
+            "weight"=>Some(U256::from(1000))
         },
         time_now,
     );
-    (env, owner, liquidity_gauge_v4_instance, time_now)
+    (env, owner, liquidity_gauge_v4_instance, time_now/*, erc20, erc20_crv, user, minter*/)
 }
 mod t1 {
     use crate::liquidity_gauge_v4_tests::*;
@@ -480,3 +487,19 @@ mod t12 {
         assert_eq!(contract.is_killed(), is_killed);
     }
 }
+// mod t13 {
+//     use crate::{liquidity_gauge_v4_tests::*, liquidity_gauge_v4_instance::address_to_str};
+//     #[test]
+//     fn test_inflation_check() {
+//         let (_, owner, contract, time_now, erc20, erc20_crv, user, minter) = deploy();
+//         let value: U256 = 100000000000u64.into();
+//         erc20.call_contract(owner, "transfer", runtime_args! {"recipient"=>Address::Account(user),"amount"=>value}, time_now);
+//         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
+//         contract.deposit(user, value, None, None, time_now);
+//         minter.call_contract(user, "mint", runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())}, time_now + 604800000);
+//         // let bal: U256 = contract.integrate_fraction(&Address::Account(user));
+//         // println!("INF: {}", bal);
+//         let bala: U256 = erc20_crv.query(BALANCES, address_to_str(&Address::Account(user)));
+//         println!("CRV BALANCE: {}", bala);
+//     }
+// }

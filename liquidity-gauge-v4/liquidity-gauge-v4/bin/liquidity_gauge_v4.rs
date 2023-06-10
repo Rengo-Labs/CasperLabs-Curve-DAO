@@ -420,9 +420,18 @@ fn inflation_rate() {
     runtime::ret(CLValue::from_t(data::get_inflation_rate()).unwrap_or_revert());
 }
 #[no_mangle]
+fn reward_count() {
+    runtime::ret(CLValue::from_t(data::get_reward_count()).unwrap_or_revert());
+}
+#[no_mangle]
 fn reward_tokens() {
     let owner: U256 = runtime::get_named_arg("owner");
     runtime::ret(CLValue::from_t(data::RewardTokens::instance().get(&owner)).unwrap_or_revert());
+}
+#[no_mangle]
+fn reward_data() {
+    let address: Key = runtime::get_named_arg("address");
+    runtime::ret(CLValue::from_t(data::RewardData::instance().get(&address)).unwrap_or_revert());
 }
 #[no_mangle]
 fn rewards_receiver() {
@@ -811,8 +820,22 @@ fn get_entry_points() -> EntryPoints {
         EntryPointType::Contract,
     ));
     entry_points.add_entry_point(EntryPoint::new(
+        "reward_count",
+        vec![],
+        Key::cl_type(),
+        EntryPointAccess::Public,
+        EntryPointType::Contract,
+    ));
+    entry_points.add_entry_point(EntryPoint::new(
         "reward_tokens",
         vec![Parameter::new("owner", U256::cl_type())],
+        Key::cl_type(),
+        EntryPointAccess::Public,
+        EntryPointType::Contract,
+    ));
+    entry_points.add_entry_point(EntryPoint::new(
+        "reward_data",
+        vec![Parameter::new("address", Key::cl_type())],
         Key::cl_type(),
         EntryPointAccess::Public,
         EntryPointType::Contract,
