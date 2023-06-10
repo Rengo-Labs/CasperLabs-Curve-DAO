@@ -26,6 +26,7 @@ pub trait GAUGEPROXY<Storage: ContractStorage>: ContractContext<Storage> {
         set_package_hash(package_hash);
     }
 
+    #[inline(always)]
     fn commit_set_admins(&self, o_admin: Key, e_admin: Key) {
         if self.get_caller() != get_ownership_admin() {
             runtime::revert(ApiError::from(Error::GaugeProxyAccessDenied1));
@@ -38,6 +39,7 @@ pub trait GAUGEPROXY<Storage: ContractStorage>: ContractContext<Storage> {
         });
     }
 
+    #[inline(always)]
     fn accept_set_admins(&self) {
         if self.get_caller() != get_future_ownership_admin() {
             runtime::revert(ApiError::from(Error::GaugeProxyAccessDenied2));
@@ -51,6 +53,7 @@ pub trait GAUGEPROXY<Storage: ContractStorage>: ContractContext<Storage> {
         });
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&self, gauge: Key, new_owner: Key) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::GaugeProxyIsLocked1));
@@ -70,6 +73,7 @@ pub trait GAUGEPROXY<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn accept_transfer_ownership(&self, gauge: Key) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::GaugeProxyIsLocked2));
@@ -84,6 +88,7 @@ pub trait GAUGEPROXY<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn set_killed(&self, gauge: Key, is_killed: bool) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::GaugeProxyIsLocked3));
@@ -105,6 +110,7 @@ pub trait GAUGEPROXY<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn set_rewards(&self, gauge: Key, reward_contract: Key, sigs: String, reward_tokens: Vec<Key>) {
         if self.get_caller() != get_ownership_admin() {
             runtime::revert(ApiError::from(Error::GaugeProxyAccessDenied5));

@@ -379,7 +379,7 @@ pub struct RewardDataStruct {
     pub period_finish: u64,
     pub rate: U256,
     pub last_update: u64,
-    pub integral: U256
+    pub integral: U256,
 }
 
 pub struct RewardData {
@@ -398,22 +398,21 @@ impl RewardData {
     }
 
     pub fn get(&self, reward_token_address: &Key) -> RewardDataStruct {
-      RewardDataStruct {
-          /*token: self
-              .dict
-                .get(
-                    hash(format!(
-                        "{}{}{}",
-                        REWARD_DATA_DICT,
-                        "_token_",
-                        reward_token_address.to_formatted_string(),
-                    ))
-                    .as_str(),
-                )
-                .unwrap_or_default(),*/
-
-          distributor: self
-              .dict
+        RewardDataStruct {
+            /*token: self
+            .dict
+              .get(
+                  hash(format!(
+                      "{}{}{}",
+                      REWARD_DATA_DICT,
+                      "_token_",
+                      reward_token_address.to_formatted_string(),
+                  ))
+                  .as_str(),
+              )
+              .unwrap_or_default(),*/
+            distributor: self
+                .dict
                 .get(
                     hash(format!(
                         "{}{}{}",
@@ -425,8 +424,8 @@ impl RewardData {
                 )
                 .unwrap_or_else(zero_address),
 
-          period_finish: self
-              .dict
+            period_finish: self
+                .dict
                 .get(
                     hash(format!(
                         "{}{}{}",
@@ -438,44 +437,44 @@ impl RewardData {
                 )
                 .unwrap_or_default(),
 
-          rate: self
+            rate: self
                 .dict
-                  .get(
-                      hash(format!(
-                          "{}{}{}",
-                          REWARD_DATA_DICT,
-                          "_rate_",
-                          reward_token_address.to_formatted_string(),
-                      ))
-                      .as_str(),
-                  )
-                  .unwrap_or_default(),
+                .get(
+                    hash(format!(
+                        "{}{}{}",
+                        REWARD_DATA_DICT,
+                        "_rate_",
+                        reward_token_address.to_formatted_string(),
+                    ))
+                    .as_str(),
+                )
+                .unwrap_or_default(),
 
-          last_update: self
+            last_update: self
                 .dict
-                  .get(
-                      hash(format!(
-                          "{}{}{}",
-                          REWARD_DATA_DICT,
-                          "_last_update_",
-                          reward_token_address.to_formatted_string(),
-                      ))
-                      .as_str(),
-                  )
-                  .unwrap_or_default(),
+                .get(
+                    hash(format!(
+                        "{}{}{}",
+                        REWARD_DATA_DICT,
+                        "_last_update_",
+                        reward_token_address.to_formatted_string(),
+                    ))
+                    .as_str(),
+                )
+                .unwrap_or_default(),
 
-          integral: self
+            integral: self
                 .dict
-                  .get(
-                      hash(format!(
-                          "{}{}{}",
-                          REWARD_DATA_DICT,
-                          "_integral_",
-                          reward_token_address.to_formatted_string(),
-                      ))
-                      .as_str(),
-                  )
-                  .unwrap_or_default(),
+                .get(
+                    hash(format!(
+                        "{}{}{}",
+                        REWARD_DATA_DICT,
+                        "_integral_",
+                        reward_token_address.to_formatted_string(),
+                    ))
+                    .as_str(),
+                )
+                .unwrap_or_default(),
         }
     }
 
@@ -490,7 +489,7 @@ impl RewardData {
             .as_str(),
             value.token,
         );*/
-    
+
         self.dict.set(
             hash(format!(
                 "{}{}{}",
@@ -501,7 +500,7 @@ impl RewardData {
             .as_str(),
             value.distributor,
         );
-    
+
         self.dict.set(
             hash(format!(
                 "{}{}{}",
@@ -512,7 +511,7 @@ impl RewardData {
             .as_str(),
             value.period_finish,
         );
-    
+
         self.dict.set(
             hash(format!(
                 "{}{}{}",
@@ -523,7 +522,7 @@ impl RewardData {
             .as_str(),
             value.rate,
         );
-    
+
         self.dict.set(
             hash(format!(
                 "{}{}{}",
@@ -534,7 +533,7 @@ impl RewardData {
             .as_str(),
             value.last_update,
         );
-    
+
         self.dict.set(
             hash(format!(
                 "{}{}{}",

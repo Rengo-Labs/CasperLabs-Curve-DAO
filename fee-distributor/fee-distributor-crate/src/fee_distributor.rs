@@ -54,6 +54,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     }
 
     #[allow(unused_assignments)]
+    #[inline(always)]
     fn _checkpoint_token(&self) {
         let token_balance: U256 = runtime::call_versioned_contract(
             get_token().into_hash().unwrap_or_revert().into(),
@@ -150,6 +151,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     /// @dev Calculates the total number of tokens to be distributed in a given week.
     ///     During setup for the initial distribution this function is only callable
     ///     by the contract owner. Beyond initial distro, it can be enabled for anyone to call.
+    #[inline(always)]
     fn checkpoint_token(&self) {
         if !((self.get_caller() == get_admin())
             || (get_can_checkpoint_token()
@@ -165,6 +167,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
         self._checkpoint_token();
     }
 
+    #[inline(always)]
     fn _find_timestamp_epoch(&self, ve: Key, timestamp: U256) -> U256 {
         let mut min: U256 = 0.into();
         let mut max: U256 = runtime::call_versioned_contract(
@@ -203,6 +206,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
         min
     }
 
+    #[inline(always)]
     fn _find_timestamp_user_epoch(
         &self,
         ve: Key,
@@ -247,6 +251,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param _user Address to query balance for
     /// @param _timestamp Epoch time
     /// @return uint256 veCRV balance
+    #[inline(always)]
     fn ve_for_at(&self, user: Key, timestamp: U256) -> U256 {
         let ve: Key = get_voting_escrow();
         let max_user_epoch: U256 = runtime::call_versioned_contract(
@@ -287,6 +292,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
         )
     }
 
+    #[inline(always)]
     fn _checkpoint_total_supply(&self) {
         let ve: Key = get_voting_escrow();
         let mut t: U256 = get_time_cursor();
@@ -353,11 +359,13 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     /// @dev The checkpoint is also updated by the first claimant each
     ///     new epoch week. This function may be called independently
     ///     of a claim, to reduce claiming gas costs.
+    #[inline(always)]
     fn checkpoint_total_supply(&self) {
         self._checkpoint_total_supply();
     }
 
     #[allow(unused_assignments)]
+    #[inline(always)]
     fn _claim(&self, addr: Key, ve: Key, last_token_time: U256) -> U256 {
         // Minimal user_epoch is 0 (if user had no point)
         let mut user_epoch: U256 = 0.into();
@@ -505,6 +513,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     ///     less than `max_epoch`, the account may claim again.
     /// @param _addr Address to claim fees for
     /// @return uint256 Amount of fees claimed in the call
+    #[inline(always)]
     fn claim(&self, addr: Option<Key> /*self.get_caller()*/) -> U256 {
         if get_lock() {
             runtime::revert(ApiError::from(Error::FeeDistributorIsLocked1));
@@ -564,6 +573,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     ///     has significant veCRV history
     /// @param _receivers List of addresses to claim for. Claiming terminates at the first `ZERO_ADDRESS`.
     /// @return bool success
+    #[inline(always)]
     fn claim_many(&self, receivers: Vec<Key>) -> bool {
         if get_lock() {
             runtime::revert(ApiError::from(Error::FeeDistributorIsLocked2));
@@ -627,6 +637,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     /// @notice Receive 3CRV into the contract and trigger a token checkpoint
     /// @param _coin Address of the coin being received (must be 3CRV)
     /// @return bool success
+    #[inline(always)]
     fn burn(&self, coin: Key) -> bool {
         if coin != get_token() {
             runtime::revert(ApiError::from(Error::FeeDistributorInvalidCoin1));
@@ -667,6 +678,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
 
     /// @notice Commit transfer of ownership
     /// @param _addr New admin address
+    #[inline(always)]
     fn commit_admin(&self, addr: Key) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::FeeDistributorAccessDenied));
@@ -676,6 +688,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     }
 
     /// @notice Apply transfer of ownership
+    #[inline(always)]
     fn apply_admin(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::FeeDistributorInvalidAdmin1));
@@ -694,6 +707,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     }
 
     /// @notice Toggle permission for checkpointing by any account
+    #[inline(always)]
     fn toggle_allow_checkpoint_token(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::FeeDistributorInvalidAdmin2));
@@ -709,6 +723,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     /// @notice Kill the contract
     /// @dev Killing transfers the entire 3CRV balance to the emergency return address
     ///     and blocks the ability to claim or burn. The contract cannot be unkilled.
+    #[inline(always)]
     fn kill_me(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::FeeDistributorInvalidAdmin3));
@@ -738,6 +753,7 @@ pub trait FEEDISTRIBUTOR<Storage: ContractStorage>: ContractContext<Storage> {
     /// @dev Tokens are sent to the emergency return address.
     /// @param _coin Token address
     /// @return bool success
+    #[inline(always)]
     fn recover_balance(&self, coin: Key) -> bool {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::FeeDistributorInvalidAdmin4));

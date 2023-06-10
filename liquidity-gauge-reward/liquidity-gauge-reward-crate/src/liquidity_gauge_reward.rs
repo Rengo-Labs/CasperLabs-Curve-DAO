@@ -112,6 +112,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     /// @param l User's amount of liquidity (LP tokens)
     /// @param L Total amount of liquidity (LP tokens)
     #[allow(non_snake_case)]
+    #[inline(always)]
     fn _update_liquidity_limit(&self, addr: Key, l: U256, L: U256) {
         // To be called after totalSupply is updated
         let voting_escrow: Key = get_voting_escrow();
@@ -183,6 +184,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     }
 
     #[allow(non_snake_case)]
+    #[inline(always)]
     fn _checkpoint_rewards(&self, addr: Key, claim_rewards: bool) {
         // Update reward integrals (no gauge weights involved: easy)
         let rewarded_token: Key = get_rewarded_token();
@@ -254,6 +256,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
 
     /// @notice Checkpoint for a user
     /// @param addr User address
+    #[inline(always)]
     fn _checkpoint(&self, addr: Key, claim_rewards: bool) {
         let token: Key = get_crv_token();
         let controller: Key = get_controller();
@@ -445,6 +448,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     /// @notice Record a checkpoint for `addr`
     /// @param addr User address
     /// @return bool success
+    #[inline(always)]
     fn user_checkpoint(&self, addr: Key) -> bool {
         if !((self.get_caller() == addr) || (self.get_caller() == get_minter())) {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardUnauthorized));
@@ -460,6 +464,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
 
     /// @notice Get the number of claimable tokens per user
     /// @return uint256 number of claimable tokens per user
+    #[inline(always)]
     fn claimable_tokens(&self, addr: Key) -> U256 {
         self._checkpoint(addr, true);
         IntegrateFraction::instance()
@@ -480,6 +485,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     /// @param addr Account to get reward amount for
     /// @return uint256 Claimable reward token amount
     #[allow(non_snake_case)]
+    #[inline(always)]
     fn claimable_reward(&self, addr: Key) -> U256 {
         let d_reward: U256 = runtime::call_versioned_contract(
             get_reward_contract().into_hash().unwrap_or_revert().into(),
@@ -522,6 +528,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     /// @notice Kick `addr` for abusing their boost
     /// @dev Only if either they had another voting event, or their voting escrow lock expired
     /// @param addr Address to kick
+    #[inline(always)]
     fn kick(&self, addr: Key) {
         let t_last: U256 = IntegrateCheckpointOf::instance().get(&addr);
         let ret: U256 = runtime::call_versioned_contract(
@@ -574,6 +581,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     /// @notice Set whether `addr` can deposit tokens for `self.get_caller()`
     /// @param addr Address to set approval on
     /// @param can_deposit bool - can this account deposit for `self.get_caller()`?
+    #[inline(always)]
     fn set_approve_deposit(&self, addr: Key, can_deposit: bool) {
         ApprovedToDeposit::instance().set(&addr, &self.get_caller(), can_deposit);
     }
@@ -581,6 +589,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     /// @notice Deposit `_value` LP tokens
     /// @param _value Number of tokens to deposit
     /// @param addr Address to deposit for
+    #[inline(always)]
     fn deposit(&self, value: U256, addr: Option<Key>) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardIsLocked1));
@@ -641,6 +650,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
 
     /// @notice Withdraw `_value` LP tokens
     /// @param _value Number of tokens to withdraw
+    #[inline(always)]
     fn withdraw(&self, value: U256, claim_rewards: bool) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardIsLocked2));
@@ -687,6 +697,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
         set_lock(false);
     }
 
+    #[inline(always)]
     fn claim_rewards(&self, addr: Option<Key>) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardIsLocked3));
@@ -712,10 +723,12 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
         set_lock(false);
     }
 
+    #[inline(always)]
     fn integrate_checkpoint(&self) -> U256 {
         PeriodTimestamp::instance().get(&get_period().as_u128().into())
     }
 
+    #[inline(always)]
     fn kill_me(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardAdminOnly1));
@@ -725,6 +738,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
 
     /// @notice Transfer ownership of GaugeController to `addr`
     /// @param addr Address to have ownership transferred to
+    #[inline(always)]
     fn commit_transfer_ownership(&self, addr: Key) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardAdminOnly2));
@@ -737,6 +751,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     }
 
     /// @notice Apply pending ownership transfer
+    #[inline(always)]
     fn apply_transfer_ownership(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardAdminOnly3));
@@ -750,6 +765,7 @@ pub trait LIQUIDITYGAUGEREWARD<Storage: ContractStorage>:
     }
 
     /// @notice Switch claiming rewards on/off. This is to prevent a malicious rewards contract from preventing CRV claiming
+    #[inline(always)]
     fn toggle_external_rewards_claim(&self, val: bool) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::LiquidityGaugeRewardAdminOnly4));

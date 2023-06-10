@@ -101,35 +101,44 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
 
         data::set_lock(false);
     }
+    #[inline(always)]
     fn reward_data(&mut self) -> RewardData {
         data::reward_data()
     }
+    #[inline(always)]
     fn lp_token(&mut self) -> Key {
         data::get_lp_token()
     }
+    #[inline(always)]
     fn admin(&mut self) -> Key {
         data::get_admin()
     }
+    #[inline(always)]
     fn reward_integral(&mut self, reward_token: Key) -> U256 {
         RewardIntegral::instance().get(&reward_token)
     }
+    #[inline(always)]
     fn reward_tokens(&mut self, index: U256) -> Key {
         RewardTokens::instance().get(&index)
     }
 
+    #[inline(always)]
     fn future_admin(&mut self) -> Key {
         data::get_future_admin()
     }
+    #[inline(always)]
     fn claim_data(&mut self, user: Key, claiming_address: Key) -> ClaimDataStruct {
         ClaimData::instance().get(&user, &claiming_address)
     }
 
     //function implementaion of liquidity gauge v3
 
+    #[inline(always)]
     fn integrate_checkpoint(&self) -> U256 {
         PeriodTimestamp::instance().get(&U256::from(data::get_period()))
     }
 
+    #[inline(always)]
     fn _update_liquidity_limit(&self, addr: Key, l: U256, _supply: U256) {
         let voting_escrow: Key = data::get_voting_escrow();
         let voting_balance: U256 = runtime::call_versioned_contract(
@@ -192,6 +201,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         });
     }
 
+    #[inline(always)]
     fn _checkpoint_rewards(
         &mut self,
         _user: Key,
@@ -288,7 +298,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
                     receiver = _user;
                 }
             }
-            
+
             let user_balance: U256 = self.balance_of(Address::from(_user));
             for (i, item) in reward_integrals
                 .iter()
@@ -348,6 +358,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
             }
         }
     }
+    #[inline(always)]
     fn _checkpoint(&mut self, addr: Key) {
         let token: Key = data::get_crv_token();
         let controller: Key = data::get_controller();
@@ -497,6 +508,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         data::IntegrateInvSupplyOf::instance().set(&addr, integrate_inv_supply);
         data::IntegrateCheckpointOf::instance().set(&addr, block_timestamp.into());
     }
+    #[inline(always)]
     fn user_checkpoint(&mut self, addr: Key) -> bool {
         if !(self.get_caller() == addr || self.get_caller() == data::get_minter()) {
             runtime::revert(Error::LiquidityGuageUnauthorized);
@@ -510,6 +522,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         true
     }
 
+    #[inline(always)]
     fn claimable_tokens(&mut self, addr: Key) -> U256 {
         self._checkpoint(addr);
         data::IntegrateFraction::instance()
@@ -526,6 +539,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
             .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError44)
     }
 
+    #[inline(always)]
     fn reward_contract(&mut self) -> Key {
         let address = self.reward_data().address;
         if address == zero_address() {
@@ -535,18 +549,22 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         }
     }
 
+    #[inline(always)]
     fn last_claim(&mut self) -> U256 {
         self.reward_data().time_stamp
     }
 
+    #[inline(always)]
     fn claimed_reward(&mut self, addr: Key, token: Key) -> U256 {
         self.claim_data(addr, token).claimed_amount
     }
 
+    #[inline(always)]
     fn claimable_reward(&mut self, addr: Key, token: Key) -> U256 {
         self.claim_data(addr, token).claimable_amount
     }
 
+    #[inline(always)]
     fn claimable_reward_write(&mut self, addr: Key, token: Key) -> U256 {
         let lock = data::get_lock();
         if lock {
@@ -563,10 +581,12 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         self.claim_data(addr, token).claimable_amount
     }
 
+    #[inline(always)]
     fn set_rewards_receiver(&mut self, receiver: Key) {
         RewardsReceiver::instance().set(&self.get_caller(), receiver)
     }
 
+    #[inline(always)]
     fn claim_rewards(&mut self, _addr: Option<Key>, _receiver: Option<Key>) {
         let lock = data::get_lock();
         if lock {
@@ -592,6 +612,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         data::set_lock(false);
     }
 
+    #[inline(always)]
     fn kick(&mut self, addr: Key) {
         let voting_escrow: Key = data::get_voting_escrow();
         let t_last: U256 = data::IntegrateCheckpointOf::instance().get(&addr);
@@ -645,6 +666,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         );
     }
 
+    #[inline(always)]
     fn deposit(&mut self, value: U256, addr: Option<Key>, claim_rewards: Option<bool>) {
         let _claim_rewards: bool = if let Some(..) = claim_rewards {
             claim_rewards.unwrap()
@@ -722,6 +744,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         });
         data::set_lock(false);
     }
+    #[inline(always)]
     fn withdraw(&mut self, value: U256, claim_rewards: Option<bool>) {
         let lock = data::get_lock();
         if lock {
@@ -790,6 +813,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         });
         data::set_lock(false);
     }
+    #[inline(always)]
     fn _transfer(&mut self, from: Key, to: Key, value: U256) {
         self._checkpoint(from);
         self._checkpoint(to);
@@ -818,6 +842,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         self.emit(&LiquidityGaugeV3Event::Transfer { from, to, value });
     }
 
+    #[inline(always)]
     fn transfer(&mut self, recipient: Address, amount: U256) -> Result<(), u32> {
         let lock = data::get_lock();
         if lock {
@@ -828,6 +853,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         data::set_lock(false);
         Ok(())
     }
+    #[inline(always)]
     fn transfer_from(
         &mut self,
         owner: Address,
@@ -853,9 +879,11 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         Ok(())
     }
 
+    #[inline(always)]
     fn approve(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         CURVEERC20::approve(self, spender, amount)
     }
+    #[inline(always)]
     fn increase_allowance(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         let res = CURVEERC20::increase_allowance(self, spender, amount);
         self.emit(&LiquidityGaugeV3Event::Approval {
@@ -865,6 +893,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         });
         res
     }
+    #[inline(always)]
     fn decrease_allowance(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         let res = CURVEERC20::decrease_allowance(self, spender, amount);
         self.emit(&LiquidityGaugeV3Event::Approval {
@@ -875,6 +904,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         res
     }
 
+    #[inline(always)]
     fn set_rewards(&mut self, reward_contract: Key, sigs: String, reward_tokens: Vec<String>) {
         let lock = data::get_lock();
         if lock {
@@ -1006,6 +1036,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         data::set_lock(false);
     }
 
+    #[inline(always)]
     fn set_killed(&mut self, is_killed: bool) {
         if self.get_caller() != self.admin() {
             runtime::revert(Error::LiquidityGaugeOnlyAdmin1);
@@ -1013,6 +1044,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         data::set_is_killed(is_killed);
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&mut self, addr: Key) {
         if self.get_caller() != self.admin() {
             runtime::revert(Error::LiquidityGaugeOnlyAdmin3);
@@ -1021,6 +1053,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         self.emit(&LiquidityGaugeV3Event::CommitOwnership { admin: addr });
     }
 
+    #[inline(always)]
     fn accept_transfer_ownership(&mut self) {
         let _admin = self.future_admin();
         if self.get_caller() != _admin {

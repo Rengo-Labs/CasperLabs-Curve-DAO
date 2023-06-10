@@ -83,6 +83,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
         set_contract_hash(contract_hash);
         set_package_hash(package_hash);
     }
+    #[inline(always)]
     fn _checkpoint(&self, addr: Key) {
         let gauge: Key = get_gauge();
         let mut token: Key = get_crv_token();
@@ -202,6 +203,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @notice Record a checkpoint for `addr`
     /// @param addr User address
     /// @return bool success
+    #[inline(always)]
     fn user_checkpoint(&self, addr: Key) -> bool {
         if !((self.get_caller() == addr) || (self.get_caller() == get_minter())) {
             runtime::revert(ApiError::from(Error::RewardWrapperUnauthorized));
@@ -213,6 +215,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @notice Get the number of claimable tokens per user
     /// @dev This function should be manually changed to "view" in the ABI
     /// @return uint256 number of claimable tokens per user
+    #[inline(always)]
     fn claimable_tokens(&self, addr: Key) -> U256 {
         let d_reward: U256 = runtime::call_versioned_contract(
             get_gauge().into_hash().unwrap_or_revert().into(),
@@ -252,6 +255,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @notice Get the number of claimable reward tokens per user
     /// @dev This function should be manually changed to "view" in the ABI
     /// @return uint256 number of claimable tokens per user
+    #[inline(always)]
     fn claimable_reward(&self, addr: Key) -> U256 {
         let gauge: Key = get_gauge();
         let claimable_reward: U256 = runtime::call_versioned_contract(
@@ -299,6 +303,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
             .checked_div(U256::from(TEN_E_NINE))
             .unwrap_or_revert_with(Error::RewardWrapperDivisionError8)
     }
+    #[inline(always)]
     fn claim_tokens(&self, addr: Option<Key>) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::RewardWrapperIsLocked1));
@@ -335,6 +340,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @notice Set whether `addr` can deposit tokens for `self.get_caller()`
     /// @param addr Address to set approval on
     /// @param can_deposit bool - can this account deposit for `self.get_caller()`?
+    #[inline(always)]
     fn set_approve_deposit(&self, addr: Key, can_deposit: bool) {
         ApprovedToDeposit::instance().set(&addr, &self.get_caller(), can_deposit);
     }
@@ -342,6 +348,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @notice Deposit `_value` LP tokens
     /// @param _value Number of tokens to deposit
     /// @param addr Address to deposit for
+    #[inline(always)]
     fn deposit(&self, value: U256, addr: Option<Key>) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::RewardWrapperIsLocked2));
@@ -412,6 +419,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
 
     /// @notice Withdraw `_value` LP tokens
     /// @param _value Number of tokens to withdraw
+    #[inline(always)]
     fn withdraw(&self, value: U256) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::RewardWrapperIsLocked3));
@@ -469,10 +477,12 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @param _owner The address which owns the funds.
     /// @param _spender The address which will spend the funds.
     /// @return An uint256 specifying the amount of tokens still available for the spender.
+    #[inline(always)]
     fn allowance(&self, owner: Key, spender: Key) -> U256 {
         // Allowances::instance().get(&owner, &spender)
         CURVEERC20::allowance(self, Address::from(owner), Address::from(spender))
     }
+    #[inline(always)]
     fn _transfer(&self, owner: Key, recipient: Key, amount: U256) {
         if get_is_killed() {
             runtime::revert(ApiError::from(Error::RewardWrapperIsKilled2));
@@ -504,6 +514,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @dev Transfer token for a specified address
     /// @param _to The address to transfer to.
     /// @param _value The amount to be transferred.
+    #[inline(always)]
     fn transfer(&mut self, recipient: Address, amount: U256) -> Result<(), Erc20Error> {
         self._transfer(self.get_caller(), Key::from(recipient), amount);
         Ok(())
@@ -512,6 +523,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     //     /// @param _from address The address which you want to send tokens from
     //     /// @param _to address The address which you want to transfer to
     //     /// @param _value uint256 the amount of tokens to be transferred
+    #[inline(always)]
     fn transfer_from(
         &mut self,
         owner: Address,
@@ -540,6 +552,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     ///  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     /// @param _spender The address which will transfer the funds
     /// @param _value The amount of tokens that may be transferred
+    #[inline(always)]
     fn approve(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         CURVEERC20::approve(self, spender, amount)
     }
@@ -549,6 +562,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @param _spender The address which will transfer the funds
     /// @param _added_value The amount of to increase the allowance
     /// @return Result on success
+    #[inline(always)]
     fn increase_allowance(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         let res = CURVEERC20::increase_allowance(self, spender, amount);
         LIQUIDITYGAUGEREWARDWRAPPER::emit(
@@ -567,6 +581,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     /// @param _spender The address which will transfer the funds
     /// @param _subtracted_value The amount of to decrease the allowance
     /// @return Result on success
+    #[inline(always)]
     fn decrease_allowance(&self, spender: Address, amount: U256) -> Result<(), Erc20Error> {
         let res = CURVEERC20::decrease_allowance(self, spender, amount);
         LIQUIDITYGAUGEREWARDWRAPPER::emit(
@@ -580,6 +595,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
         res
     }
 
+    #[inline(always)]
     fn kill_me(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::RewardWrapperAdminOnly1));
@@ -589,6 +605,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
 
     /// @notice Transfer ownership of GaugeController to `addr`
     /// @param addr Address to have ownership transferred to
+    #[inline(always)]
     fn commit_transfer_ownership(&self, addr: Key) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::RewardWrapperAdminOnly2));
@@ -601,6 +618,7 @@ pub trait LIQUIDITYGAUGEREWARDWRAPPER<Storage: ContractStorage>:
     }
 
     /// @notice Apply pending ownership transfer
+    #[inline(always)]
     fn apply_transfer_ownership(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::RewardWrapperAdminOnly3));

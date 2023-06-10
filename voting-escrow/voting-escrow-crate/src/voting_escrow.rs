@@ -80,18 +80,21 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         set_package_hash(package_hash);
     }
 
+    #[inline(always)]
     fn only_admin(&self) {
         if self.get_caller() != get_admin() {
             runtime::revert(ApiError::from(Error::VotingEscrowAdminOnly));
         }
     }
 
+    #[inline(always)]
     fn commit_transfer_ownership(&mut self, addr: Key) {
         self.only_admin();
         set_future_admin(addr);
         VOTINGESCROW::emit(self, &VotingEscrowEvent::CommitOwnership { admin: addr });
     }
 
+    #[inline(always)]
     fn apply_transfer_ownership(&mut self) {
         self.only_admin();
         let admin: Key = get_future_admin();
@@ -102,15 +105,18 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         VOTINGESCROW::emit(self, &VotingEscrowEvent::ApplyOwnership { admin });
     }
 
+    #[inline(always)]
     fn get_last_user_slope(&self, addr: Key) -> i128 {
         let uepoch: U256 = UserPointEpoch::instance().get(&addr);
         UserPointHistory::instance().get(&addr, &uepoch).slope()
     }
 
+    #[inline(always)]
     fn user_point_history_ts(&self, addr: Key, idx: U256) -> U256 {
         UserPointHistory::instance().get(&addr, &idx).ts
     }
 
+    #[inline(always)]
     fn locked_end(&self, addr: Key) -> U256 {
         Locked::instance().get(&addr).end
     }
@@ -119,6 +125,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param addr User's wallet address. No user checkpoint if 0x0
     /// @param old_locked Pevious locked amount / end lock time for the user
     /// @param new_locked New locked amount / end lock time for the user
+    #[inline(always)]
     fn _checkpoint(&self, addr: Key, old_locked: LockedBalance, new_locked: LockedBalance) {
         let mut u_old: Point = Point::default();
         let mut u_new: Point = Point::default();
@@ -375,6 +382,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param _value Amount to deposit
     /// @param unlock_time New time when to unlock the tokens, or 0 if unchanged
     /// @param locked_balance Previous locked amount / timestamp
+    #[inline(always)]
     fn _deposit_for(
         &mut self,
         addr: Key,
@@ -440,6 +448,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         );
     }
 
+    #[inline(always)]
     fn checkpoint(&self) {
         self._checkpoint(
             zero_address(),
@@ -448,6 +457,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         )
     }
 
+    #[inline(always)]
     fn deposit_for(&mut self, addr: Key, value: U256) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::VotingEscrowIsLocked1));
@@ -475,6 +485,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn create_lock(&mut self, value: U256, unlock_time: U256) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::VotingEscrowIsLocked2));
@@ -514,6 +525,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn increase_amount(&mut self, value: U256) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::VotingEscrowIsLocked3));
@@ -541,6 +553,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn increase_unlock_time(&mut self, unlock_time: U256) {
         if get_lock() {
             runtime::revert(ApiError::from(Error::VotingEscrowIsLocked4));
@@ -580,6 +593,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         set_lock(false);
     }
 
+    #[inline(always)]
     fn withdraw(&mut self) {
         let mut locked: LockedBalance = Locked::instance().get(&self.get_caller());
         if U256::from(u64::from(get_blocktime())) < locked.end {
@@ -635,6 +649,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param _block Block to find
     /// @param max_epoch Don't go beyond this epoch
     /// @return Approximate timestamp for block
+    #[inline(always)]
     fn _find_block_epoch(&self, block: U256, max_epoch: U256) -> U256 {
         // Binary search
         let mut min: U256 = 0.into();
@@ -662,6 +677,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         min
     }
 
+    #[inline(always)]
     fn balance_of(&self, addr: Key, t: Option<U256>) -> U256 {
         let t: U256 = match t {
             Some(val) => val,
@@ -701,6 +717,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
     }
 
     #[allow(unused_assignments)]
+    #[inline(always)]
     fn balance_of_at(&self, addr: Key, block: U256) -> U256 {
         if block > block_number().into() {
             runtime::revert(ApiError::from(Error::VotingEscrowInvalidBlockNumber1));
@@ -793,6 +810,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
     /// @param point The point (bias/slope) to start search from
     /// @param t Time to calculate the total voting power at
     /// @return Total voting power at that time
+    #[inline(always)]
     fn _supply_at(&self, point: Point, t: U256) -> U256 {
         let mut last_point: Point = point;
         let mut t_i: U256 = last_point
@@ -839,6 +857,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         last_point.bias().try_into().unwrap()
     }
 
+    #[inline(always)]
     fn total_supply(&self, t: Option<U256>) -> U256 {
         let t: U256 = match t {
             Some(val) => val,
@@ -853,6 +872,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         self._supply_at(last_point, t)
     }
 
+    #[inline(always)]
     fn total_supply_at(&self, block: U256) -> U256 {
         if block > block_number().into() {
             runtime::revert(ApiError::from(Error::VotingEscrowInvalidBlockNumber2));
@@ -913,6 +933,7 @@ pub trait VOTINGESCROW<Storage: ContractStorage>: ContractContext<Storage> {
         )
     }
 
+    #[inline(always)]
     fn change_controller(&self, new_controller: Key) {
         if self.get_caller() != get_controller() {
             runtime::revert(ApiError::from(Error::VotingEscrowNotController));
