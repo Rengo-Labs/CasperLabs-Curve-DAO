@@ -401,7 +401,7 @@ mod vote_functions_and_effect_with_period_test_cases {
             blocktime + week,
         );
         let ret: U256 = env.query_account_named_key(owner, &[GAUGE_RELATIVE_WEIGHT.into()]);
-        assert_eq!(ret, 500000000.into());
+        assert_eq!(ret, 333333333.into());
     }
     #[test]
     fn test_gauge_controller_vote_for_gauge_weights() {
@@ -922,7 +922,7 @@ mod gauge_relative_weight_test_cases {
         );
 
         let ret: U256 = env.query_account_named_key(_owner, &[GAUGE_RELATIVE_WEIGHT.into()]);
-        assert_eq!(ret, 500000000.into());
+        assert_eq!(ret, 333333333.into());
     }
 
     #[test]
@@ -986,7 +986,7 @@ mod gauge_relative_weight_test_cases {
         );
 
         let ret: U256 = env.query_account_named_key(_user, &[GAUGE_RELATIVE_WEIGHT.into()]);
-        assert_eq!(ret, 500000000.into());
+        assert_eq!(ret, 333333333.into());
     }
 
     #[test]
@@ -1030,6 +1030,69 @@ mod gauge_relative_weight_test_cases {
         );
 
         let ret: U256 = env.query_account_named_key(_owner, &[GAUGE_RELATIVE_WEIGHT.into()]);
+        assert_eq!(ret, 0.into());
+    }
+    #[test]
+    fn test_gauge_controller_gauge_relative_weight_of_disable_gauge_by_passing_zero_weight() {
+        let (
+            env,
+            gauge_controller,
+            _owner,
+            _token,
+            _voting_escrow,
+            blocktime,
+            liquidity_gauge,
+            liquidity_gauge_1,
+        ) = deploy();
+        let _user = env.next_user();
+        let _user1 = env.next_user();
+        assert_eq!(gauge_controller.token(), Key::Hash(_token.package_hash()));
+        assert_eq!(
+            gauge_controller.voting_escrow(),
+            Key::Hash(_voting_escrow.package_hash())
+        );
+        assert_eq!(gauge_controller.admin(), Key::from(_owner));
+        let week: u64 = VOTING_ESCROW_WEEK.as_u64();
+        assert_eq!(
+            gauge_controller.time_total(),
+            U256::from(blocktime / week * week)
+        );
+        let name: String = "type".to_string();
+        gauge_controller.add_type(_owner, name, Some(100.into()), blocktime);
+        let gauge_type: (bool, U128) = (false, 0.into());
+        gauge_controller.add_gauge(
+            _owner,
+            liquidity_gauge,
+            gauge_type,
+            None::<U256>,
+            blocktime,
+        );
+        let name: String = "type2".to_string();
+        gauge_controller.add_type(_owner, name, Some(100.into()), blocktime);
+        let gauge_type: (bool, U128) = (false, 1.into());
+        gauge_controller.add_gauge(
+            _owner,
+            liquidity_gauge_1,
+            gauge_type,
+            None::<U256>,
+            blocktime,
+        );
+        let week: u64 = VOTING_ESCROW_WEEK.as_u64();
+        TestContract::new(
+            &env,
+            TEST_SESSION_CODE_WASM,
+            TEST_SESSION_CODE_NAME,
+            _user,
+            runtime_args! {
+                "entrypoint" => String::from(GAUGE_RELATIVE_WEIGHT),
+                "package_hash" => Key::from(gauge_controller.contract_package_hash()),
+                "addr" => liquidity_gauge_1,
+                "time" => None::<U256>
+            },
+            blocktime + week,
+        );
+
+        let ret: U256 = env.query_account_named_key(_user, &[GAUGE_RELATIVE_WEIGHT.into()]);
         assert_eq!(ret, 0.into());
     }
     #[test]
@@ -1169,7 +1232,7 @@ mod gauge_relative_weight_test_cases {
         );
 
         let ret: U256 = env.query_account_named_key(_user, &[GAUGE_RELATIVE_WEIGHT_WRITE.into()]);
-        assert_eq!(ret, 500000000.into());
+        assert_eq!(ret, 333333333.into());
     }
 }
 mod get_type_and_total_weight_test_cases {

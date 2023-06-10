@@ -131,6 +131,12 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         Key::Hash(minter.package_hash()),
         Key::Account(owner),
     );
+    erc20_crv.call_contract(
+        owner,
+        "set_minter",
+        runtime_args! {"minter"=>Key::Hash(minter.package_hash())},
+        time_now,
+    );
     // For Minting Purpose
     let to = Key::Hash(liquidity_gauge_v3_instance.package_hash());
     let amount: U256 = U256::from(TEN_E_NINE * 100000000000000000000);
@@ -150,7 +156,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
     gauge_controller.call_contract(
         owner,
         "add_type",
-        runtime_args! {"name" => _name, "weight" => None::<U256> },
+        runtime_args! {"name" => _name, "weight" => Some(U256::from(1)) },
         time_now,
     );
     let addr: Key = Key::Account(owner);
@@ -161,7 +167,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         runtime_args! {
             "addr" => addr,
             "gauge_type" => gauge_type,
-            "weight"=>None::<U256>
+            "weight"=>Some(U256::from(10))
         },
         time_now,
     );
@@ -169,7 +175,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
     gauge_controller.call_contract(
         owner,
         "add_type",
-        runtime_args! {"name" => _name_1, "weight" => None::<U256> },
+        runtime_args! {"name" => _name_1, "weight" => Some(U256::from(100)) },
         time_now,
     );
     let addr1: Key = Key::Hash(liquidity_gauge_v3_instance.package_hash());
@@ -180,7 +186,7 @@ fn deploy() -> (TestEnv, AccountHash, TestContract, u64) {
         runtime_args! {
             "addr" => addr1,
             "gauge_type" => gauge_type_1,
-            "weight"=>None::<U256>
+            "weight"=>Some(U256::from(1000))
         },
         time_now,
     );

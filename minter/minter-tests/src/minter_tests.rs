@@ -87,6 +87,12 @@ fn deploy() -> (
         Key::Account(owner),
         block_time,
     );
+    erc20_crv.call_contract(
+        owner,
+        "set_minter",
+        runtime_args! {"minter"=>Key::Hash(minter.package_hash())},
+        block_time,
+    );
     (
         env,
         MINTERInstance::instance(minter),
@@ -142,7 +148,7 @@ fn test_minter_mint() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(1))
         },
         block_time,
     );
@@ -171,7 +177,7 @@ fn test_minter_mint() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(10))
         },
         0,
     );
@@ -211,7 +217,7 @@ fn test_minter_mint_many() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(100))
         },
         block_time,
     );
@@ -240,7 +246,7 @@ fn test_minter_mint_many() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(1000))
         },
         block_time,
     );
@@ -278,7 +284,7 @@ fn test_minter_mint_for() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(2))
         },
         0,
     );
@@ -307,7 +313,7 @@ fn test_minter_mint_for() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(20))
         },
         block_time,
     );
@@ -366,7 +372,7 @@ fn test_minter_mint_with_deposit() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(200))
         },
         block_time,
     );
@@ -397,7 +403,7 @@ fn test_minter_mint_with_deposit() {
         "add_type",
         runtime_args! {
             "name" => name,
-            "weight" => None::<U256>
+            "weight" => Some(U256::from(2000))
         },
         0,
     );

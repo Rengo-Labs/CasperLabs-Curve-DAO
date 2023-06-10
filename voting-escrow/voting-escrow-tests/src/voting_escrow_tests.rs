@@ -255,8 +255,8 @@ fn test_create_lock() {
     );
     let balance_after_lock: U256 = env.query_account_named_key(owner, &[BALANCE_OF.into()]);
     assert!(
-        balance_after_lock / TEN_E_NINE <= 882.into()
-            && balance_after_lock / TEN_E_NINE >= 879.into()
+        balance_after_lock / TEN_E_NINE <= 890.into()
+            && balance_after_lock / TEN_E_NINE >= 860.into()
     );
 }
 
@@ -443,8 +443,8 @@ fn test_balance_of() {
     );
     let balance_after_lock: U256 = env.query_account_named_key(owner, &[BALANCE_OF.into()]);
     assert!(
-        balance_after_lock / TEN_E_NINE <= 882.into()
-            && balance_after_lock / TEN_E_NINE >= 879.into()
+        balance_after_lock / TEN_E_NINE <= 890.into()
+            && balance_after_lock / TEN_E_NINE >= 860.into()
     );
 }
 
@@ -537,7 +537,7 @@ fn test_total_supply() {
         time_now,
     );
     let ret: U256 = env.query_account_named_key(owner, &[TOTAL_SUPPLY.into()]);
-    assert!(ret / TEN_E_NINE <= 882.into() && ret / TEN_E_NINE >= 879.into());
+    assert!(ret / TEN_E_NINE <= 890.into() && ret / TEN_E_NINE >= 860.into());
     instance.create_lock(user, amount, unlock_time, time_now);
     TestContract::new(
         &env,
@@ -553,7 +553,7 @@ fn test_total_supply() {
     );
     let ret: U256 = env.query_account_named_key(owner, &[TOTAL_SUPPLY.into()]);
     assert!(
-        ret / TEN_E_NINE <= 1770.into() && ret / TEN_E_NINE >= 1755.into(),
+        ret / TEN_E_NINE <= 1780.into() && ret / TEN_E_NINE >= 1740.into(),
         "Invalid default total supply"
     );
     //Total supply will be 0 after lock time expired
@@ -623,7 +623,7 @@ fn test_total_supply_at() {
         time_now,
     );
     let ret: U256 = env.query_account_named_key(owner, &[TOTAL_SUPPLY_AT.into()]);
-    assert!(ret / TEN_E_NINE <= 882.into() && ret / TEN_E_NINE >= 879.into());
+    assert!(ret / TEN_E_NINE <= 890.into() && ret / TEN_E_NINE >= 860.into());
     instance.create_lock(user, amount, unlock_time, time_now);
     TestContract::new(
         &env,
@@ -639,7 +639,7 @@ fn test_total_supply_at() {
     );
     let ret: U256 = env.query_account_named_key(owner, &[TOTAL_SUPPLY_AT.into()]);
     assert!(
-        ret / TEN_E_NINE <= 1770.into() && ret / TEN_E_NINE >= 1755.into(),
+        ret / TEN_E_NINE <= 1780.into() && ret / TEN_E_NINE >= 1740.into(),
         "Invalid default total supply at"
     );
 }

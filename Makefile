@@ -132,8 +132,7 @@ test-only-liquidity-gauge-wrapper:
 	cargo test -p liquidity-gauge-wrapper-tests ownership_and_kill_functions_test_cases -- --test-threads=1
 	cargo test -p liquidity-gauge-wrapper-tests test_deposit -- --test-threads=1
 	cargo test -p liquidity-gauge-wrapper-tests panic_test_cases -- --test-threads=1
-	# Intense memory test cases below (Require 32gb + RAM)
-	# cargo test -p liquidity-gauge-wrapper-tests test_withdraw -- --test-threads=1
+	cargo test -p liquidity-gauge-wrapper-tests test_withdraw -- --test-threads=1
 test-only-minter:
 	cargo test -p minter-tests
 test-only-reward-only-gauge:
@@ -359,14 +358,14 @@ all:
 	make test-curve-token-v3
 	make test-curve-erc20
 	make test-erc20-crv
-	# make test-fee-distributor
+	make test-fee-distributor
 	make test-gauge-controller
 	make test-gauge-proxy
-	# make test-liquidity-gauge-reward
-	# make test-liquidity-gauge-reward-wrapper
-	# make test-liquidity-gauge-wrapper
+	make test-liquidity-gauge-reward
+	make test-liquidity-gauge-reward-wrapper
+	make test-liquidity-gauge-wrapper
 	make test-minter
-	# make test-reward-only-gauge
+	make test-reward-only-gauge
 	make test-vesting-escrow
 	make test-vesting-escrow-factory
 	make test-voting-escrow
