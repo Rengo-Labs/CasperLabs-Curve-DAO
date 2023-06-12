@@ -354,6 +354,29 @@ test-liquidity-gauge-v3:
 test-liquidity-gauge-v4:
 	make build-contract-liquidity-gauge-v4 && make copy-wasm-file-liquidity-gauge-v4 && make test-only-liquidity-gauge-v4
 
+build-all:
+	make build-contract-gauge-proxy
+	make build-contract-liquidity-gauge-reward
+	make build-contract-liquidity-gauge-reward-wrapper
+	make build-contract-liquidity-gauge-wrapper
+	make build-contract-minter
+	make build-contract-reward-only-gauge
+	make build-contract-vesting-escrow
+	make build-contract-vesting-escrow-factory
+	make build-contract-vesting-escrow-simple
+	make build-contract-curve-token-v3
+	make build-contract-curve-erc20
+	make build-contract-erc20-crv
+	make build-contract-fee-distributor
+	make build-contract-gauge-controller
+	make build-contract-voting-escrow
+	make build-contract-ownable
+	make build-i-reward-distribution-recipient
+	make build-contract-curve-erc20
+	make build-curve-rewards
+	make build-contract-liquidity-gauge-v3
+	make build-contract-liquidity-gauge-v4
+
 all:
 	make test-curve-token-v3
 	make test-curve-erc20
