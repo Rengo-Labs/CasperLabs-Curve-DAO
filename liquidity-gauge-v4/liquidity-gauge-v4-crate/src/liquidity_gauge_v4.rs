@@ -881,10 +881,6 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             runtime::revert(Error::LiquidityGaugeV4NewDistributorExists1);
         }
 
-        if reward_data.distributor != zero_address() {
-            runtime::revert(Error::LiquidityGaugeV4RewardDataExists1);
-        }
-
         reward_data.distributor = distributor;
         RewardData::instance().set(&_reward_token, reward_data);
     }
