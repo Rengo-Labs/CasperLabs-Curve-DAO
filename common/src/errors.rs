@@ -713,6 +713,8 @@ pub enum Error {
     MinterLocked2 = 10803,
     ///(Minter Gauge Locked)
     MinterLocked3 = 10804,
+    ///(Minter Gauge Subtraction)
+    MinterSubtraction = 10805,
 
     /// (Reward Only Gauge OverFlow1)
     RewardOnlyGaugeOverFlow1 = 10901,

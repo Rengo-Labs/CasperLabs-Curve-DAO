@@ -4,6 +4,7 @@ use alloc::collections::BTreeMap;
 use alloc::{string::String, vec::Vec};
 use casper_contract::contract_api::runtime;
 use casper_contract::contract_api::storage;
+use casper_contract::unwrap_or_revert::UnwrapOrRevert;
 use casper_types::{runtime_args, ApiError, ContractPackageHash, Key, RuntimeArgs, U128, U256};
 use casperlabs_contract_utils::{ContractContext, ContractStorage};
 use common::{errors::*, utils::*};
@@ -85,7 +86,9 @@ pub trait MINTER<Storage: ContractStorage>: ContractContext<Storage> {
             runtime_args! {"owner" => _for},
         );
         let minted = self.minted(_for, gauge_addr);
-        let to_mint: U256 = total_mint - minted;
+        let to_mint: U256 = total_mint
+            .checked_sub(minted)
+            .unwrap_or_revert_with(Error::MinterSubtraction);
         if to_mint != U256::from(0) {
             let token = self.token();
             let token_hash_add_array = match token {
