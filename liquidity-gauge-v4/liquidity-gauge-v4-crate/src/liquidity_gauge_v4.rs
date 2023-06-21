@@ -307,6 +307,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                         claim_data.claimed_amount = total_claimed
                             .checked_add(total_claimable)
                             .unwrap_or_revert_with(Error::LiquidityGaugeOverFlow3);
+                        claim_data.claimable_amount = U256::from(0);
                         ClaimData::instance().set(&_user, &token, claim_data);
                     } else if new_claimable > U256::from(0) {
                         claim_data.claimed_amount = total_claimed;
