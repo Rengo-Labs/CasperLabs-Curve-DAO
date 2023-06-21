@@ -455,16 +455,18 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             &addr,
             data::IntegrateFraction::instance()
                 .get(&addr)
-                .checked_add(working_balance)
-                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError40)
-                .checked_mul(
-                    integrate_inv_supply
-                        .checked_sub(data::IntegrateInvSupplyOf::instance().get(&addr))
-                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError41),
+                .checked_add(
+                    working_balance
+                        .checked_mul(
+                            integrate_inv_supply
+                                .checked_sub(data::IntegrateInvSupplyOf::instance().get(&addr))
+                                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError41),
+                        )
+                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError42)
+                        .checked_div(U256::from(10).pow(9.into()))
+                        .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError43),
                 )
-                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError42)
-                .checked_div(U256::from(10).pow(9.into()))
-                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError43),
+                .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError40),
         );
         data::IntegrateInvSupplyOf::instance().set(&addr, integrate_inv_supply);
         data::IntegrateCheckpointOf::instance().set(&addr, block_timestamp.into());
