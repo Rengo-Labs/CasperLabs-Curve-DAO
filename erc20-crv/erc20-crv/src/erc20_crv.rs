@@ -94,6 +94,37 @@ pub trait ERC20CRV<Storage: ContractStorage>:
         data::set_rate(0.into());
         data::set_start_epoch_supply(data::get_init_supply());
     }
+
+    fn migrate(&mut self) {
+      if data::get_owner() == zero_address() {
+        data::set_owner(self.get_caller())
+      }
+      
+      if self.get_caller() != data::get_owner() {
+        runtime::revert(ApiError::from(Error::Erc20CRVInvalidOwner));
+      }      
+
+      let base: i32 = 10;
+      data::set_is_updated(false);
+      data::set_init_supply(
+        CURVEERC20::total_supply(self),
+      );
+      AdminWhitelist::init();
+      AdminWhitelist::instance().set(&self.get_caller(), true);
+      let blocktime_u64: u64 = runtime::get_blocktime().into();
+      let blocktime: U256 = U256::from(blocktime_u64);
+      let start_epoch_time: U256 = blocktime
+          .checked_sub(data::INFLATION_DELAY)
+          .unwrap_or_revert_with(Error::Erc20CRVOverFlow8)
+          .checked_sub(data::RATE_REDUCTION_TIME)
+          .unwrap_or_revert_with(Error::Erc20CRVUnderFlow3);
+      data::set_start_epoch_time(start_epoch_time);
+      data::set_mining_epoch(0.into());
+      data::set_rate(0.into());
+      data::set_start_epoch_supply(data::get_init_supply());
+      ERC20CRV::burn(self, U256::from(1081656954) * (base.pow(u32::from(CURVEERC20::decimals(self)))));
+    }
+
     /// @dev Update mining rate and supply at the start of the epoch
     /// Any modifying mining call must also call this
     #[inline(always)]

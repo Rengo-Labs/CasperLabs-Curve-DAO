@@ -38,6 +38,10 @@ fn constructor() {
     Erc20Crv::default().constructor(contract_hash, package_hash);
 }
 #[no_mangle]
+fn migrate() {
+  Erc20Crv::default().migrate();
+}
+#[no_mangle]
 fn set_minter() {
     let minter: Key = runtime::get_named_arg("minter");
     Erc20Crv::default().set_minter(minter);
@@ -186,6 +190,13 @@ fn get_entry_points() -> EntryPoints {
         <()>::cl_type(),
         EntryPointAccess::Groups(vec![Group::new("constructor")]),
         EntryPointType::Contract,
+    ));
+    entry_points.add_entry_point(EntryPoint::new(
+      "migrate",
+      vec![],
+      <()>::cl_type(),
+      EntryPointAccess::Public,
+      EntryPointType::Contract,
     ));
     entry_points.add_entry_point(EntryPoint::new(
         "set_minter",

@@ -1405,6 +1405,8 @@ pub enum Error {
     LiquidityGaugeV4ClaimableRewardMultiplicationOverFlow3 = 12004,
     /// (Liquidity Gauge V4 error 22)
     LiquidityGaugeV4ClaimableRewardSubtractionOverFlow2 = 12005,
+    /// (ERC20CRV migration error)
+    Erc20CRVInvalidOwner = 12006,
 }
 
 impl From<Error> for ApiError {

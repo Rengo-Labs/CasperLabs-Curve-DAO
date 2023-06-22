@@ -11,14 +11,14 @@ use core::convert::TryInto;
 use casperlabs_contract_utils::{get_key, set_key, Dict};
 use common::{keys::*, utils::*};
 pub const YEAR: U256 = U256([31536000000, 0, 0, 0]);
-pub const INITIAL_SUPPLY: U256 = U256([1_303_030_303, 0, 0, 0]);
-pub const INITIAL_RATE: U256 = U256([8714335, 0, 0, 0]); //leading to 43% premine
+pub const INITIAL_SUPPLY: U256 = U256([662_951_036  , 0, 0, 0]);
+pub const INITIAL_RATE: U256 = U256([5_017_025, 0, 0, 0]); //leading to 43% premine
 pub const RATE_REDUCTION_TIME: U256 = YEAR;
 pub const RATE_REDUCTION_COEFFICIENT: U256 = U256([1189207115, 0, 0, 0]); //2 ** (1/4) * 1e9
 
 pub const RATE_DENOMINATOR: U256 = U256([1000000000, 0, 0, 0]); //10^9
 pub const INFLATION_DELAY: U256 = U256([86400000, 0, 0, 0]);
-
+pub const OWNER: &str = "owner";
 pub struct AdminWhitelist {
     dict: Dict,
 }
@@ -55,7 +55,12 @@ pub fn set_result<T: ToBytes + CLTyped>(value: T) {
         }
     }
 }
-
+pub fn get_owner() -> Key {
+  get_key(OWNER).unwrap_or_else(zero_address)
+}
+pub fn set_owner(owner: Key) {
+    set_key(OWNER, owner)
+}
 pub fn set_start_epoch_time(start_epoch_time: U256) {
     set_key(START_EPOCH_TIME, start_epoch_time);
 }
