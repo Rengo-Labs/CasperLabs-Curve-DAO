@@ -54,7 +54,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             "symbol",
             runtime_args! {},
         );
-        let mut name: String = "Curve.fi ".to_string();
+        let mut name: String = "CasperSwap.xyz ".to_string();
         let post_name: &str = "Gauge Deposit";
         name.push_str(symbol.as_str());
         name.push_str(post_name);
