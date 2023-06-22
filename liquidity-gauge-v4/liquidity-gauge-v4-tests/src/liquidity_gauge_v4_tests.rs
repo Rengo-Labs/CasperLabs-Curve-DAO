@@ -139,6 +139,14 @@ fn deploy() -> (
         Key::Hash(minter.package_hash()),
         Key::Account(owner),
     );
+    let liquidity_gauge_v4_instance_1 = LIQUIDITYGUAGEV4INSTANCEInstance::new_deploy(
+        &env,
+        "LiquidityGaugeV4-1",
+        owner,
+        Key::Hash(erc20.package_hash()),
+        Key::Hash(minter.package_hash()),
+        Key::Account(owner),
+    );
 
     erc20_crv.call_contract(
         owner,
@@ -147,21 +155,15 @@ fn deploy() -> (
         time_now,
     );
 
-    // For Minting Purpose
-    let to = Key::Hash(liquidity_gauge_v4_instance.package_hash());
+    // Need to give approval to LGv4 for transfering tokens
     let amount: U256 = U256::from(TEN_E_NINE * 100000000000000000000);
-    erc20.call_contract(
-        owner,
-        "mint",
-        runtime_args! {"to" => to , "amount" => amount},
-        time_now,
-    );
     erc20.call_contract(
         owner,
         "approve",
         runtime_args! {"spender" =>Address::Contract(liquidity_gauge_v4_instance.package_hash().into()) , "amount" => amount},
         time_now,
     );
+
     let _name: String = "type".to_string();
     gauge_controller.call_contract(
         owner,
@@ -169,13 +171,12 @@ fn deploy() -> (
         runtime_args! {"name" => _name, "weight" => Some(U256::from(1)) },
         time_now,
     );
-    let addr: Key = Key::Account(owner);
     let gauge_type: (bool, U128) = (false, 0.into());
     gauge_controller.call_contract(
         owner,
         "add_gauge",
         runtime_args! {
-            "addr" => addr,
+            "addr" => Key::Hash(liquidity_gauge_v4_instance.package_hash()),
             "gauge_type" => gauge_type,
             "weight"=>Some(U256::from(10))
         },
@@ -188,13 +189,12 @@ fn deploy() -> (
         runtime_args! {"name" => _name_1, "weight" => Some(U256::from(100)) },
         time_now,
     );
-    let addr1: Key = Key::Hash(liquidity_gauge_v4_instance.package_hash());
     let gauge_type_1: (bool, U128) = (false, 1.into());
     gauge_controller.call_contract(
         owner,
         "add_gauge",
         runtime_args! {
-            "addr" => addr1,
+            "addr" => Key::Hash(liquidity_gauge_v4_instance_1.package_hash()),
             "gauge_type" => gauge_type_1,
             "weight"=>Some(U256::from(1000))
         },
@@ -504,21 +504,314 @@ mod t12 {
         assert_eq!(contract.is_killed(), is_killed);
     }
 }
-mod t13 {
+mod value_checks {
     use crate::{liquidity_gauge_v4_instance::address_to_str, liquidity_gauge_v4_tests::*};
     #[test]
-    fn test_crv_claim() {
+    fn user_deposit_and_mint_4_times_at_weekly_intervals() {
+        // We should get 7 days (milliseconds) * inflation rate each week
         let (_, owner, contract, time_now, erc20, erc20_crv, minter) = deploy();
-        let value: U256 = 100000000000u64.into();
+        let value: U256 = 100_000_000_000u64.into();
         let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
+        const SUPPLY: U256 = U256([1303030303000000000u64, 0, 0, 0]);
+
         contract.deposit(owner, value, None, None, time_now);
+        let mut new_time: u64 = time_now + (7 * 86400000);
+        println!("Rate-1: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
         minter.call_contract(
             owner,
             "mint",
             runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
-            time_now + 604800000,
+            new_time,
         );
-        let bal: U256 = erc20_crv.query(BALANCES, address_to_str(&Address::Account(owner)));
-        assert!(bal > 0.into(), "CRV Balance not minted");
+        println!(
+            "Balance-1: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+
+        new_time += 14 * 86400000;
+        println!("Rate-2: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "Balance-2: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+
+        new_time += 21 * 86400000;
+        println!("Rate-3: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "Balance-3: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+
+        new_time += 28 * 86400000;
+        println!("Rate-4: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "Balance-4: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+    }
+
+    #[test]
+    fn two_user_deposit_equal_and_mint_4_times_at_half_weekly_intervals() {
+        // We should get 7 days (milliseconds) * inflation rate each week
+        let (env, owner, contract, time_now, erc20, erc20_crv, minter) = deploy();
+        let value: U256 = 100_000_000_000u64.into();
+        let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
+        const SUPPLY: U256 = U256([1303030303000000000u64, 0, 0, 0]);
+
+        // sharing and approving some lp tokens for
+        let user = env.next_user();
+        erc20.call_contract(
+            owner,
+            "transfer",
+            runtime_args! {"recipient"=>Address::Account(user),"amount"=>U256::from(value)},
+            time_now,
+        );
+        erc20.call_contract(
+            user,
+            "approve",
+            runtime_args! {"spender"=>Address::Contract(contract.package_hash().into()),"amount"=>value},
+            time_now,
+        );
+
+        contract.deposit(owner, value, None, None, time_now);
+        contract.deposit(user, value, None, None, time_now);
+
+        let mut new_time: u64 = time_now + (7 * 86400000);
+        println!("Rate-1: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-1: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-1: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+
+        new_time += 14 * 86400000;
+        println!("Rate-2: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-2: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-2: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+
+        new_time += 21 * 86400000;
+        println!("Rate-3: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "USer1-Balance-3: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-3: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+
+        new_time += 28 * 86400000;
+        println!("Rate-4: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-4: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-4: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+    }
+
+    #[test]
+    fn two_user_deposit_ratio_and_mint_4_times_at_weekly_ratio_intervals() {
+        // -- 9 : 1 -- //
+
+        // We should get 7 days (milliseconds) * inflation rate each week
+        let (env, owner, contract, time_now, erc20, erc20_crv, minter) = deploy();
+        let value_1: U256 = 100_000_000_000u64.into();
+        let value_9: U256 = 900_000_000_000u64.into();
+        let contract = LIQUIDITYGUAGEV4INSTANCEInstance::instance(contract);
+        const SUPPLY: U256 = U256([1303030303000000000u64, 0, 0, 0]);
+
+        // sharing and approving some lp tokens for
+        let user = env.next_user();
+        erc20.call_contract(
+            owner,
+            "transfer",
+            runtime_args! {"recipient"=>Address::Account(user),"amount"=>U256::from(value_9)},
+            time_now,
+        );
+        erc20.call_contract(
+            user,
+            "approve",
+            runtime_args! {"spender"=>Address::Contract(contract.package_hash().into()),"amount"=>value_9},
+            time_now,
+        );
+
+        contract.deposit(owner, value_1, None, None, time_now);
+        contract.deposit(user, value_9, None, None, time_now);
+
+        let mut new_time: u64 = time_now + (7 * 86400000);
+        println!("Rate-1: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-1: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-1: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+
+        new_time += 14 * 86400000;
+        println!("Rate-2: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-2: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-2: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+
+        new_time += 21 * 86400000;
+        println!("Rate-3: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-3: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-3: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
+
+        new_time += 28 * 86400000;
+        println!("Rate-4: {}", erc20_crv.query_named_key::<U256>(RATE.into()));
+        minter.call_contract(
+            owner,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        minter.call_contract(
+            user,
+            "mint",
+            runtime_args! {"gauge_addr"=>Key::Hash(contract.package_hash())},
+            new_time,
+        );
+        println!(
+            "User1-Balance-4: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(owner))) - SUPPLY
+        );
+        println!(
+            "User2-Balance-4: {}",
+            erc20_crv.query::<U256>(BALANCES, address_to_str(&Address::Account(user)))
+        );
     }
 }
+// 604800000 * 8714335
+// 518400000 * 8714335
+// 2258640476691560
+// 12711535128620280
+// 28521243565979280
+// 49600854815790960
