@@ -389,7 +389,7 @@ pub trait LIQUIDITYTGAUGEV3<Storage: ContractStorage>:
         }
         let block_timestamp: u64 = runtime::get_blocktime().into();
         if U256::from(block_timestamp) > period_time {
-            let mut working_supply = data::get_working_supply();
+            let working_supply = data::get_working_supply();
             let () = runtime::call_versioned_contract(
                 controller.into_hash().unwrap_or_revert().into(),
                 None,

@@ -10,7 +10,7 @@ use alloc::string::String;
 use casper_contract::contract_api::storage;
 use casper_contract::{contract_api::runtime, unwrap_or_revert::UnwrapOrRevert};
 use casper_types::{runtime_args, ApiError, ContractPackageHash, Key, RuntimeArgs, U128, U256};
-use casperlabs_contract_utils::{ContractContext, ContractStorage};
+use casperlabs_contract_utils::{set_key, ContractContext, ContractStorage};
 use common::{errors::*, utils::*};
 
 pub enum GAUGECONLTROLLEREvent {
@@ -369,12 +369,17 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
 
     #[inline(always)]
     fn _gauge_relative_weight(&mut self, addr: Key, time: U256) -> U256 {
-        let t: U256 = time
+        let t: U256 = (time
+              .checked_add(WEEK)
+              .unwrap_or_revert_with(Error::GaugeControllerDivide2)
+            )
             .checked_div(WEEK)
             .unwrap_or_revert_with(Error::GaugeControllerDivide2)
             .checked_mul(WEEK)
             .unwrap_or_revert_with(Error::GaugeControllerMultiply5);
+        // set_key("diag_t", t);
         let _total_weight = self.points_total(t);
+        // set_key("diag_total_weight", _total_weight);
         if _total_weight > U256::from(0) {
             let gauge_type: i128 = self
                 .gauge_types_(addr)

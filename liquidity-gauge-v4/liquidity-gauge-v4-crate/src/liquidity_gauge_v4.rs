@@ -12,7 +12,7 @@ use casper_contract::{
 use casper_types::{
     runtime_args, ApiError, ContractHash, ContractPackageHash, Key, RuntimeArgs, U256,
 };
-use casperlabs_contract_utils::{ContractContext, ContractStorage};
+use casperlabs_contract_utils::{set_key, ContractContext, ContractStorage};
 use common::{errors::*, utils::*};
 use crv20::{self, Address, CURVEERC20};
 use curve_casper_erc20::Error as Erc20Error;
@@ -300,7 +300,10 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                             token_package_hash,
                             None,
                             "transfer",
-                            runtime_args! {"to" => Address::from(receiver),"amount" => total_claimable},
+                            runtime_args! {
+                              "recipient" => Address::from(receiver),
+                              "amount" => total_claimable,
+                            },
                         );
                         // if len(response) != 0:
                         //     assert convert(response, bool)
@@ -371,7 +374,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 U256::from(block_timestamp),
             );
 
-            for i in 0..500 {
+            for _ in 0..500 {
                 let dt: U256 = week_time
                     .checked_sub(prev_week_time)
                     .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError21);
@@ -381,9 +384,24 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                     "gauge_relative_weight",
                     runtime_args! {
                         "addr" => Key::from(data::get_package_hash()),
-                        "time" => Some(prev_week_time.checked_div(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError22).checked_mul(data::WEEK).unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError23))
+                        "time" => Some(
+                          prev_week_time
+                            .checked_div(data::WEEK)
+                            .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError22)
+                            .checked_mul(data::WEEK)
+                            .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError23)
+                          )
                     },
                 );
+                /*
+                set_key("diag_w", w);
+                set_key("diag_week_time", 
+                  prev_week_time
+                    .checked_div(data::WEEK)
+                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError22)
+                    .checked_mul(data::WEEK)
+                    .unwrap_or_revert_with(Error::LiquidityGaugeArithmeticError23)
+                );*/
                 if working_supply > 0.into() {
                     if (prev_future_epoch >= prev_week_time) && (prev_future_epoch < week_time) {
                         integrate_inv_supply = integrate_inv_supply
@@ -707,7 +725,11 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             runtime::revert(Error::LiquidityGaugeLocked3);
         }
         data::set_lock(true);
-        let claim_rewards: bool = claim_rewards.is_some();
+        let _claim_rewards: bool = if let Some(..) = claim_rewards {
+          claim_rewards.unwrap()
+        } else {
+            false
+        };
         self._checkpoint(self.get_caller());
         let mut _total_supply: U256 = 0.into();
         if value != 0.into() {
@@ -717,7 +739,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 self._checkpoint_rewards(
                     self.get_caller(),
                     _total_supply,
-                    claim_rewards,
+                    _claim_rewards,
                     zero_address(),
                 )
             }
@@ -742,7 +764,10 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
                 token_package_hash,
                 None,
                 "transfer",
-                runtime_args! {"recipient" => Address::from(self.get_caller()),"amount" => value},
+                runtime_args! {
+                  "recipient" => Address::from(self.get_caller()),
+                  "amount" => value
+                },
             );
         }
         self.emit(&LiquidityGaugeV4Event::Withdraw {

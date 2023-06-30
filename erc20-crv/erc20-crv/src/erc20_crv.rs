@@ -122,7 +122,7 @@ pub trait ERC20CRV<Storage: ContractStorage>:
       data::set_mining_epoch(0.into());
       data::set_rate(0.into());
       data::set_start_epoch_supply(data::get_init_supply());
-      ERC20CRV::burn(self, U256::from(1081656954) * (base.pow(u32::from(CURVEERC20::decimals(self)))));
+      let _ = ERC20CRV::burn(self, U256::from(1081656954) * (base.pow(u32::from(CURVEERC20::decimals(self)))));
     }
 
     /// @dev Update mining rate and supply at the start of the epoch
