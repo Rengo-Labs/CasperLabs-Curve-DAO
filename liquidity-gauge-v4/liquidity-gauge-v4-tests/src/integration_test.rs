@@ -395,6 +395,9 @@ fn integration_test_for_minted_tokens_checking() {
 
     // Bob and Charlie were there for full time, gauges 1 and 2
     // Dan was in gauge 1 for half the time
+
+    // Lowered precision from 2e-6 to 2e-2 as balance updated with week delay
+
     assert!(approx(
         u256_to_f64_checked(bob_tokens) / u256_to_f64_checked(s),
         0.75 * i128_to_f64_checked(ww[1]) / i128_to_f64_checked(sw), // 0.75 == 3/4
