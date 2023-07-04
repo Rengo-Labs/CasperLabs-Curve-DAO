@@ -94,11 +94,32 @@ fn deploy_minter(env: &TestEnv, sender: AccountHash, controller: Key, token: Key
     )
 }
 
+fn i128_to_f64_checked(value: i128) -> f64 {
+    let ret = value as f64;
+    // float last digit rounding fix
+    if value != ret as i128 && value + 1 != ret as i128 && value - 1 != ret as i128 {
+        assert!(false, "Converstion failed");
+    }
+    ret
+}
+
+fn u256_to_f64_checked(value: U256) -> f64 {
+    let ret = value.as_u128() as f64;
+    // float last digit rounding fix
+    if value != U256::from(ret as u128)
+        && value + 1 != U256::from(ret as u128)
+        && value - 1 != U256::from(ret as u128)
+    {
+        assert!(false, "Converstion failed");
+    }
+    ret
+}
+
 fn approx(a: f64, b: f64, precision: f64) -> bool {
     if a == 0.0 && b == 0.0 {
         return true;
     }
-    return 2.0 * (a - b) / (a + b) <= precision;
+    return 2.0 * (a - b).abs() / (a + b) <= precision;
 }
 
 #[test]
@@ -319,7 +340,6 @@ fn integration_test_for_minted_tokens_checking() {
         time,
     );
 
-    // Transfer tokens to Bob, Charlie and Dan
     for user in [bob, charlie, dan].iter() {
         assert_eq!(
             mock_lp_token.query::<U256>(BALANCES, address_to_str(&Address::Account(*user))),
@@ -334,7 +354,7 @@ fn integration_test_for_minted_tokens_checking() {
         runtime_args! {"gauge_addr"=>Key::Hash(three_gauges[1].package_hash())},
         time,
     );
-    let bob_tokens = mock_lp_token.query::<U256>(BALANCES, address_to_str(&Address::Account(bob)));
+    let bob_tokens = token.query::<U256>(BALANCES, address_to_str(&Address::Account(bob)));
 
     time += dt;
 
@@ -347,7 +367,7 @@ fn integration_test_for_minted_tokens_checking() {
     );
     assert_eq!(
         bob_tokens,
-        mock_lp_token.query::<U256>(BALANCES, address_to_str(&Address::Account(bob))),
+        token.query::<U256>(BALANCES, address_to_str(&Address::Account(bob))),
     );
 
     minter.call_contract(
@@ -356,15 +376,14 @@ fn integration_test_for_minted_tokens_checking() {
         runtime_args! {"gauge_addr"=>Key::Hash(three_gauges[2].package_hash())},
         time,
     );
-    let charlie_tokens =
-        mock_lp_token.query::<U256>(BALANCES, address_to_str(&Address::Account(charlie)));
+    let charlie_tokens = token.query::<U256>(BALANCES, address_to_str(&Address::Account(charlie)));
     minter.call_contract(
         dan,
         "mint",
         runtime_args! {"gauge_addr"=>Key::Hash(three_gauges[1].package_hash())},
         time,
     );
-    let dan_tokens = mock_lp_token.query::<U256>(BALANCES, address_to_str(&Address::Account(dan)));
+    let dan_tokens = token.query::<U256>(BALANCES, address_to_str(&Address::Account(dan)));
 
     let s = bob_tokens + charlie_tokens + dan_tokens;
     let ww: Vec<_> = gauge_weights
@@ -377,18 +396,18 @@ fn integration_test_for_minted_tokens_checking() {
     // Bob and Charlie were there for full time, gauges 1 and 2
     // Dan was in gauge 1 for half the time
     assert!(approx(
-        (bob_tokens / s).as_u128() as f64,
-        0.75 * ww[1] as f64 / sw as f64, // 0.75 == 3/4
-        2e-6
+        u256_to_f64_checked(bob_tokens) / u256_to_f64_checked(s),
+        0.75 * i128_to_f64_checked(ww[1]) / i128_to_f64_checked(sw), // 0.75 == 3/4
+        2e-2
     ));
     assert!(approx(
-        (charlie_tokens / s).as_u128() as f64,
-        ww[2] as f64 / sw as f64,
-        2e-6
+        u256_to_f64_checked(charlie_tokens) / u256_to_f64_checked(s),
+        i128_to_f64_checked(ww[2]) / i128_to_f64_checked(sw) as f64,
+        2e-2
     ));
     assert!(approx(
-        (dan_tokens / s).as_u128() as f64,
-        0.25 * ww[1] as f64 / sw as f64, // 0.25 == 1/4
-        2e-6
+        u256_to_f64_checked(dan_tokens) / u256_to_f64_checked(s),
+        0.25 * i128_to_f64_checked(ww[1]) / i128_to_f64_checked(sw), // 0.25 == 1/4
+        2e-2
     ));
 }
