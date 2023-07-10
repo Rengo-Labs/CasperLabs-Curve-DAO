@@ -176,7 +176,8 @@ test-only-liquidity-gauge-v4:
 	cargo test -p liquidity-gauge-v4-tests t10 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t11 -- --test-threads=1
 	cargo test -p liquidity-gauge-v4-tests t12 -- --test-threads=1
-	cargo test -p liquidity-gauge-v4-tests t13 -- --test-threads=1
+	cargo test -p liquidity-gauge-v4-tests value_checks -- --test-threads=1 --nocapture
+	cargo test -p liquidity-gauge-v4-tests integration_test_for_minted_tokens_checking -- --test-threads=1 --nocapture
 
 test-only-i-reward-distribution-recipient:
 	cargo test -p i-reward-distribution-recipient-tests
