@@ -370,8 +370,8 @@ pub trait GAUGECONLTROLLER<Storage: ContractStorage>: ContractContext<Storage> {
     #[inline(always)]
     fn _gauge_relative_weight(&mut self, addr: Key, time: U256) -> U256 {
         let t: U256 = (time
-              .checked_add(WEEK)
-              .unwrap_or_revert_with(Error::GaugeControllerDivide2)
+              /*.checked_add(WEEK)
+              .unwrap_or_revert_with(Error::GaugeControllerDivide2)*/
             )
             .checked_div(WEEK)
             .unwrap_or_revert_with(Error::GaugeControllerDivide2)
