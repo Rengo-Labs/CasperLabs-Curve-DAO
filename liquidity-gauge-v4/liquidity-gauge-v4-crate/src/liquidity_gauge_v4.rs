@@ -948,6 +948,7 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
         let block_timestamp: u64 = runtime::get_blocktime().into();
         if block_timestamp >= period_finish {
             reward_data.rate = amount / data::WEEK;
+            set_key("reward_data_amount", amount)
         } else {
             let remaining: u64 = period_finish
                 .checked_sub(block_timestamp)
@@ -962,13 +963,17 @@ pub trait LIQUIDITYTGAUGEV4<Storage: ContractStorage>:
             reward_data.rate = amount
                 .checked_add(leftover)
                 .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensAdditionOverFlow1)
-                / data::WEEK
+                / data::WEEK;
+                set_key("reward_data_amount", amount + leftover)
         }
 
         reward_data.last_update = block_timestamp;
         reward_data.period_finish = block_timestamp
             .checked_add(data::WEEK.as_u64())
             .unwrap_or_revert_with(Error::LiquidityGaugeV4DepositRewardTokensAdditionOverFlow2);
+
+        set_key("reward_data_rate", reward_data.rate);
+        set_key("reward_data_period_finish", reward_data.period_finish);
 
         RewardData::instance().set(&_reward_token, reward_data);
         data::set_lock(false);
